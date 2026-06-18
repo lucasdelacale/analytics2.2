@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics Map</title>
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700&display=swap" rel="stylesheet">
+<style>
+/* ══ TOKENS ═══════════════════════════════════════════════════════ */
+:root {
+  --font:       'Satoshi', 'DM Sans', system-ui, sans-serif;
+  --mono:       var(--font);
+  --serif:      var(--font);
+  --r-pill:     24px;
+  --r-card:     14px;
+  --r-sm:       8px;
+  --teal:       #558AA0;
+  --teal-pale:  #E8F2F6;
+  --teal-glow:  rgba(85,138,160,0.12);
+}
+
+/* ══ LIGHT ═════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:         #F3F5F7;
+    --bg-2:       #EDEFF2;
+    --bg-3:       #E2E4E8;
+    --surface:    #FFFFFF;
+    --surface-2:  #F7F8F9;
+    --card-bg:    #FFFFFF;
+    --card-border:#DADDE2;
+    --line:       #DADDE2;
+    --line-soft:  rgba(0,0,0,0.05);
+    --ink:        #13171F;
+    --ink-2:      #2E3138;
+    --ink-3:      #6E7179;
+    --ink-4:      #A9ACB4;
+    --green:      #166534;
+    --green-pale: #F0FDF4;
+    --amber:      #92400E;
+    --amber-pale: #FFFBEB;
+    --red:        #991B1B;
+    --red-pale:   #FEF2F2;
+    --topo:       #5B21B6;
+    --meio:       #1E40AF;
+    --fundo:      #92400E;
+    --accent:     #171717;
+    --accent-pale:#EEF0F2;
+    --teal:       #2C7A96;
+    --teal-pale:  #E8F2F6;
+    --teal-glow:  rgba(44,122,150,0.12);
+  }
+}
+
+/* ══ DARK ══════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:         #09090D;
+    --bg-2:       #131317;
+    --bg-3:       #1A1A1E;
+    --surface:    #000000;
+    --surface-2:  #111114;
+    --card-bg:    #131317;
+    --card-border:#27272A;
+    --line:       #27272A;
+    --line-soft:  rgba(255,255,255,0.05);
+    --ink:        #F0F0F0;
+    --ink-2:      #C8C8CB;
+    --ink-3:      #78787D;
+    --ink-4:      #48484D;
+    --green:      #4ADE80;
+    --green-pale: #052E16;
+    --amber:      #FCD34D;
+    --amber-pale: #1C1100;
+    --red:        #F87171;
+    --red-pale:   #1C0505;
+    --topo:       #A78BFA;
+    --meio:       #60A5FA;
+    --fundo:      #FBBF24;
+    --accent:     #F0F0F0;
+    --accent-pale:#1A1A1E;
+    --teal:       #5FA3BC;
+    --teal-pale:  #0F1E28;
+    --teal-glow:  rgba(95,163,188,0.12);
+  }
+}
+
+/* ══ RESET ══════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ══ HEADER ════════════════════════════════════════════════════════ */
+header{
+  border-bottom:1px solid var(--line);
+  padding:2.5rem 3rem 2rem;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:2rem;
+  flex-wrap:wrap;
+}
+.header-left{max-width:560px}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin-bottom:10px;
+}
+h1{
+  font-family:var(--serif);
+  font-size:clamp(2rem,3.5vw,2.8rem);
+  font-weight:400;
+  line-height:1.08;
+  letter-spacing:-.02em;
+  color:var(--ink);
+}
+h1 em{font-style:normal;color:var(--teal)}
+.header-meta{margin-top:12px;font-size:13px;color:var(--ink-3);line-height:1.7}
+.platform-strip{display:flex;gap:6px;flex-wrap:wrap}
+.plat{
+  font-family:var(--mono);
+  font-size:11px;
+  padding:5px 12px;
+  border:1px solid var(--line);
+  background:var(--bg-2);
+  border-radius:var(--r-pill);
+  color:var(--ink-3);
+  white-space:nowrap;
+}
+
+/* ══ NAV ════════════════════════════════════════════════════════════ */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  padding:0 3rem;
+  display:flex;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+nav::-webkit-scrollbar{display:none}
+nav a{
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  text-decoration:none;
+  color:var(--ink-3);
+  padding:14px 16px;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;
+  transition:color .15s,border-color .15s;
+}
+nav a:hover{color:var(--ink)}
+nav a.active{color:var(--teal);border-bottom-color:var(--teal)}
+nav a:focus-visible{outline:2px solid var(--teal);outline-offset:-2px;border-radius:2px}
+
+/* ══ MAIN ═══════════════════════════════════════════════════════════ */
+main{max-width:1100px;margin:0 auto;padding:3rem 3rem 6rem}
+section{margin-bottom:5rem}
+
+/* ══ SECTION HEADER ════════════════════════════════════════════════ */
+.section-header{
+  display:flex;align-items:baseline;gap:14px;
+  margin-bottom:1.5rem;padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+.section-tag{
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4);
+}
+h2{
+  font-family:var(--serif);font-size:1.55rem;font-weight:400;
+  color:var(--ink);letter-spacing:-.01em;
+}
+.section-desc{font-size:13px;color:var(--ink-3);max-width:620px;line-height:1.75;margin-bottom:1.75rem}
+
+/* ══ CARD BASE ══════════════════════════════════════════════════════ */
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--r-card);
+}
+.card:hover{border-color:color-mix(in srgb,var(--teal) 30%,var(--card-border))}
+
+/* ══ FUNIL ══════════════════════════════════════════════════════════ */
+.funnel-wrapper{display:grid;grid-template-columns:160px 1fr;gap:0}
+.funnel-spine{display:flex;flex-direction:column;align-items:flex-end;padding-right:20px}
+.spine-stage{display:flex;flex-direction:column;align-items:flex-end}
+.spine-label{font-family:var(--serif);font-size:1.15rem;font-style:italic}
+.spine-label.topo{color:var(--topo)}.spine-label.meio{color:var(--meio)}.spine-label.fundo{color:var(--fundo)}
+.spine-sub{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-4);margin-top:2px}
+.spine-connector{flex:1;width:1px;background:var(--line);margin:6px 0;min-height:20px;position:relative}
+.spine-arrow{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:5px solid var(--ink-4)}
+.funnel-cards{display:flex;flex-direction:column;gap:6px}
+.stage-block{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--r-card);overflow:hidden;transition:all .2s}
+.stage-block:hover{border-color:color-mix(in srgb,var(--teal) 30%,var(--card-border))}
+.stage-block.open{border-color:var(--teal)}
+.stage-header{display:flex;align-items:center;justify-content:space-between;padding:15px 20px;cursor:pointer;user-select:none;gap:12px}
+.stage-title-group{display:flex;align-items:center;gap:10px}
+.stage-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.stage-dot.topo{background:var(--topo)}.stage-dot.meio{background:var(--meio)}.stage-dot.fundo{background:var(--fundo)}
+.stage-name{font-size:13px;font-weight:600;color:var(--ink)}
+.stage-obj{font-size:11px;color:var(--ink-3);font-style:italic}
+.stage-platforms{display:flex;gap:4px;flex-wrap:wrap}
+.plat-badge{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:var(--r-pill);border:1px solid;font-weight:500}
+@media(prefers-color-scheme:light){
+  .pb-meta{background:#F5F3FF;color:#5B21B6;border-color:#C4B5FD}
+  .pb-google{background:#EFF6FF;color:#1E40AF;border-color:#93C5FD}
+  .pb-tiktok{background:#F5F5F5;color:#3A3A3A;border-color:#D0D0D0}
+  .pb-dv360{background:#F0FDF4;color:#166534;border-color:#86EFAC}
+  .pb-ga4{background:#FFFBEB;color:#92400E;border-color:#FCD34D}
+}
+@media(prefers-color-scheme:dark){
+  .pb-meta{background:#1E1030;color:#C4B5FD;border-color:#3B1F6A}
+  .pb-google{background:#0F1A30;color:#93C5FD;border-color:#1E3A6A}
+  .pb-tiktok{background:#1A1A1A;color:#888;border-color:#333}
+  .pb-dv360{background:#052010;color:#4ADE80;border-color:#0A3A1A}
+  .pb-ga4{background:#1C1000;color:#FCD34D;border-color:#3A2000}
+}
+.stage-toggle{font-size:20px;color:var(--ink-4);transition:all .2s;line-height:1;flex-shrink:0}
+.stage-block.open .stage-toggle{transform:rotate(45deg);color:var(--teal)}
+.stage-body{display:none;padding:0 20px 20px}
+.stage-block.open .stage-body{display:block}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:18px}
+.metric-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--r-sm);padding:12px}
+.metric-name{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink);margin-bottom:4px;letter-spacing:.04em}
+.metric-desc{font-size:11px;color:var(--ink-3);line-height:1.65}
+.corr-title{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4);margin-bottom:10px}
+.corr-list{display:flex;flex-direction:column;gap:7px}
+.corr-item{display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;gap:6px;font-size:11px}
+.corr-signal{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 10px;color:var(--ink-2);font-style:italic}
+.corr-arrow{font-family:var(--mono);font-size:13px;color:var(--ink-4);text-align:center}
+.corr-action{background:var(--teal-pale);border:1px solid var(--teal-glow);border-radius:var(--r-sm);padding:6px 10px;color:var(--ink);font-weight:500}
+.signal-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.signal-box{border-radius:var(--r-sm);padding:10px 12px;border:1px solid}
+.signal-box.ok{background:var(--green-pale);border-color:color-mix(in srgb,var(--green) 20%,transparent)}
+.signal-box.warn{background:var(--amber-pale);border-color:color-mix(in srgb,var(--amber) 20%,transparent)}
+.signal-box.bad{background:var(--red-pale);border-color:color-mix(in srgb,var(--red) 20%,transparent)}
+.sig-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.signal-box.ok .sig-label{color:var(--green)}.signal-box.warn .sig-label{color:var(--amber)}.signal-box.bad .sig-label{color:var(--red)}
+.sig-text{font-size:11px;color:var(--ink-2);line-height:1.6}
+
+/* ══ PLATFORM TABS ══════════════════════════════════════════════════ */
+.ptabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.ptabs::-webkit-scrollbar{display:none}
+.ptab{
+  font-family:var(--font);font-size:10px;font-weight:500;letter-spacing:.08em;
+  text-transform:uppercase;padding:10px 16px;cursor:pointer;border:none;
+  background:none;color:var(--ink-3);border-bottom:2px solid transparent;
+  margin-bottom:-1px;white-space:nowrap;transition:all .15s;
+  border-radius:var(--r-sm) var(--r-sm) 0 0;
+}
+.ptab:hover{color:var(--ink);background:var(--bg-2)}
+.ptab.active{color:var(--teal);border-bottom-color:var(--teal)}
+.ptab:focus-visible{outline:2px solid var(--teal);outline-offset:-2px;border-radius:2px}
+.cptab{
+  font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.08em;
+  text-transform:uppercase;padding:5px 10px;cursor:pointer;border:1px solid var(--card-border);
+  background:var(--bg);color:var(--ink-3);border-radius:var(--r-pill);
+  transition:all .15s;white-space:nowrap;
+}
+.cptab:hover{border-color:var(--teal);color:var(--teal)}
+.cptab.sel{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
+.p-panel{display:none}.p-panel.active{display:block}
+.macete-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.macete-card{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--r-card);padding:16px;
+  border-left:3px solid transparent;transition:all .15s;
+}
+.macete-card:hover{border-color:var(--teal)}
+.macete-card.diag{border-left-color:var(--teal)}
+.macete-card.escala{border-left-color:var(--green)}
+.macete-card.criativo{border-left-color:var(--meio)}
+.macete-card.alerta{border-left-color:var(--red)}
+.macete-tag{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4);margin-bottom:5px}
+.macete-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.4}
+.macete-body{font-size:12px;color:var(--ink-3);line-height:1.7}
+.macete-body code{font-family:var(--mono);font-size:10px;background:var(--bg-2);padding:1px 5px;border-radius:4px;color:var(--teal)}
+
+/* ══ DIAG TABLE ═════════════════════════════════════════════════════ */
+.dtable-wrap{overflow-x:auto;border:1px solid var(--card-border);border-radius:var(--r-card)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--bg-2);border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:10px 14px;text-align:left;white-space:nowrap}
+td{padding:10px 14px;color:var(--ink-2);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--bg-2)}
+td:first-child{font-family:var(--mono);font-size:11px;color:var(--ink);white-space:nowrap}
+.td-s{font-style:italic;color:var(--ink-3)}
+.td-a{font-weight:500;color:var(--teal)}
+.td-w{font-size:10px;color:var(--ink-4)}
+
+/* ══ GA4 ════════════════════════════════════════════════════════════ */
+.ga4-flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));border:1px solid var(--card-border);border-radius:var(--r-card);overflow:hidden}
+.ga4-step{padding:20px 16px;border-right:1px solid var(--line);background:var(--card-bg)}
+.ga4-step:last-child{border-right:none}
+.ga4-num{font-family:var(--serif);font-size:2.4rem;color:var(--line);line-height:1;margin-bottom:8px}
+.ga4-label{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.ga4-metric{font-family:var(--mono);font-size:10px;color:var(--teal);margin-bottom:6px}
+.ga4-desc{font-size:11px;color:var(--ink-3);line-height:1.65}
+.ga4-warn{margin-top:8px;font-size:10px;color:var(--amber);background:var(--amber-pale);border-radius:var(--r-sm);padding:5px 8px;border:1px solid color-mix(in srgb,var(--amber) 20%,transparent)}
+
+/* ══ RULES ══════════════════════════════════════════════════════════ */
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.rule-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--r-card);padding:18px;display:flex;gap:14px;align-items:flex-start;transition:all .15s}
+.rule-card:hover{border-color:color-mix(in srgb,var(--teal) 30%,var(--card-border))}
+.rule-num{font-family:var(--serif);font-size:1.6rem;font-style:italic;color:var(--line);line-height:1;flex-shrink:0;width:32px;text-align:center}
+.rule-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.rule-body{font-size:11px;color:var(--ink-3);line-height:1.7}
+.rule-body strong{color:var(--ink);font-weight:500}
+
+/* ══ TOMADOR DE DECISÃO ═════════════════════════════════════════════ */
+.dec-shell{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--r-card);overflow:hidden}
+.dec-form{padding:32px}
+.dec-step{
+  margin-bottom:24px;
+  padding:20px;
+  border:1px solid var(--card-border);
+  border-radius:var(--r-sm);
+  transition:all .15s;
+}
+.dec-step.done{background:var(--teal-pale);border-color:var(--teal-glow)}
+.dec-step-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dec-step-num{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--bg-2);border:1px solid var(--line);
+  font-family:var(--mono);font-size:10px;font-weight:500;color:var(--ink-3);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .15s;
+}
+.dec-step.done .dec-step-num{background:var(--teal);border-color:var(--teal);color:#fff}
+.dec-step-label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.dec-step.done .dec-step-label{color:var(--teal)}
+.btn-group{display:flex;flex-wrap:wrap;gap:6px}
+.dBtn{
+  font-family:var(--font);
+  font-size:12px;font-weight:450;
+  padding:8px 16px;
+  border:1px solid var(--card-border);
+  background:var(--bg);
+  color:var(--ink-2);
+  border-radius:var(--r-pill);
+  cursor:pointer;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.dBtn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-pale)}
+.dBtn.sel{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:500}
+.dBtn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+/* metric cards (exact values) */
+.metric-inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:4px}
+.metric-input-block{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--r-sm);padding:14px;display:flex;flex-direction:column;gap:6px}
+.mi-label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.mi-row{display:flex;align-items:center;gap:8px}
+.mi-field{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
+.mi-inp{
+  width:100%;min-width:0;padding:6px 8px;border:1px solid var(--card-border);
+  border-radius:var(--r-sm);background:var(--bg);color:var(--ink);
+  font-family:var(--font);font-size:13px;outline:none;-moz-appearance:textfield;
+}
+.mi-inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.mi-inp:focus{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-glow)}
+.mi-inp:disabled{opacity:.35;cursor:not-allowed}
+.mi-inp::placeholder{color:var(--ink-4);font-size:11px}
+.mi-slash{color:var(--ink-4);font-size:14px;flex-shrink:0}
+.mi-unit{font-family:var(--mono);font-size:10px;color:var(--ink-4);flex-shrink:0;min-width:18px;text-align:right}
+
+/* sliders */
+.mi-slider{-webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:2px;background:var(--line);outline:none;cursor:pointer}
+.mi-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--teal);border:2px solid var(--card-bg);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.mi-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--teal);border:2px solid var(--card-bg);cursor:pointer}
+.mi-slider-val{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--teal);min-width:24px;text-align:right}
+.mi-slider:focus{box-shadow:0 0 0 2px var(--teal-glow)}
+.mi-score{display:flex;align-items:center;gap:4px}
+.mi-num{font-family:var(--mono);font-size:14px;font-weight:600}
+.mi-green .mi-num{color:var(--green)}
+.mi-amber .mi-num{color:var(--amber)}
+.mi-red .mi-num{color:var(--red)}
+
+/* cards & buttons shadow — floating effect */
+.card,.stage-block,.macete-card,.rule-card,.radar-card,.dec-shell,.metric-input-block{
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+.dBtn,.rfBtn,.cptab,.dec-run,.m-ind{
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.card:hover,.stage-block:hover,.macete-card:hover,.rule-card:hover,.radar-card:hover,.metric-input-block:hover{
+  box-shadow:0 8px 24px rgba(0,0,0,.10);
+  transform:translateY(-2px);
+}
+.dBtn:hover,.rfBtn:hover{
+  transform:translateY(-1px);
+}
+
+.dec-run{
+  display:block;width:100%;margin-top:24px;
+  padding:14px 20px;background:var(--teal);color:#fff;
+  font-family:var(--font);font-size:14px;font-weight:600;letter-spacing:.04em;
+  border:none;border-radius:var(--r-pill);cursor:pointer;
+  transition:all .15s;
+}
+.dec-run:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.dec-run:active:not(:disabled){transform:translateY(0)}
+.dec-run:disabled{opacity:.35;cursor:not-allowed}
+.dec-run:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+/* result */
+.dec-result{display:none;border-top:1px solid var(--line);padding:28px}
+.dec-result.vis{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.dr-health{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.dr-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 16px;border-radius:var(--r-pill);
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid;
+}
+.dr-pill.ok{background:var(--green-pale);color:var(--green);border-color:color-mix(in srgb,var(--green) 25%,transparent)}
+.dr-pill.warn{background:var(--amber-pale);color:var(--amber);border-color:color-mix(in srgb,var(--amber) 25%,transparent)}
+.dr-pill.bad{background:var(--red-pale);color:var(--red);border-color:color-mix(in srgb,var(--red) 25%,transparent)}
+.dr-scale{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--r-pill);font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;border:1px solid}
+.dr-scale.scale{background:var(--teal-pale);color:var(--teal);border-color:var(--teal-glow)}
+.dr-scale.hold{background:var(--amber-pale);color:var(--amber);border-color:color-mix(in srgb,var(--amber) 25%,transparent)}
+.dr-scale.brake{background:var(--red-pale);color:var(--red);border-color:color-mix(in srgb,var(--red) 25%,transparent)}
+.dr-hl{font-family:var(--serif);font-size:1.3rem;color:var(--ink);margin-bottom:10px;letter-spacing:-.01em}
+.dr-body{font-size:13px;color:var(--ink-2);line-height:1.8;margin-bottom:20px}
+.dr-body strong{color:var(--ink);font-weight:600}
+.dr-section{margin-bottom:18px}
+.dr-sec-title{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-4);margin-bottom:10px}
+.dr-actions{display:flex;flex-direction:column;gap:7px}
+.dr-action{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:12px;color:var(--ink-2);
+  background:var(--bg-2);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:10px 12px;
+  border-left:3px solid var(--teal);
+  line-height:1.6;
+}
+.dr-tips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.dr-tip{background:var(--teal-pale);border:1px solid var(--teal-glow);border-radius:var(--r-sm);padding:10px 12px}
+.dr-tip-title{font-family:var(--mono);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);margin-bottom:4px}
+.dr-tip-body{font-size:11px;color:var(--ink-2);line-height:1.65}
+.dr-warn-box{background:var(--amber-pale);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:16px;line-height:1.6}
+
+/* ══ RADAR ══════════════════════════════════════════════════════════ */
+.radar-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.rfBtn{
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  padding:6px 14px;border:1px solid var(--card-border);background:var(--bg-2);color:var(--ink-3);
+  border-radius:var(--r-pill);cursor:pointer;transition:all .15s;
+}
+.rfBtn:hover{border-color:var(--teal);color:var(--teal)}
+.rfBtn.sel{background:var(--teal);border-color:var(--teal);color:#fff}
+.rfBtn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.radar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.radar-card{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--r-card);padding:18px;
+  transition:all .2s;
+  cursor:default;
+}
+.radar-card.hidden{opacity:0;pointer-events:none;height:0;padding:0;border:none;margin:0;overflow:hidden}
+.radar-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.radar-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.radar-dot.red{background:var(--red)}.radar-dot.amber{background:var(--amber)}.radar-dot.purple{background:var(--teal)}.radar-dot.green{background:var(--green)}
+.radar-badge{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:var(--r-pill);border:1px solid}
+.radar-badge.red{color:var(--red);border-color:color-mix(in srgb,var(--red) 30%,transparent);background:var(--red-pale)}
+.radar-badge.amber{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 30%,transparent);background:var(--amber-pale)}
+.radar-badge.purple{color:var(--teal);border-color:var(--teal-glow);background:var(--teal-pale)}
+.radar-badge.green{color:var(--green);border-color:color-mix(in srgb,var(--green) 30%,transparent);background:var(--green-pale)}
+.radar-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.radar-signal{font-family:var(--mono);font-size:10px;color:var(--ink-3);margin-bottom:8px;letter-spacing:.02em}
+.radar-body{font-size:12px;color:var(--ink-3);line-height:1.7;margin-bottom:10px}
+.radar-checks{display:flex;flex-direction:column;gap:4px}
+.radar-check{font-size:11px;color:var(--ink-3);display:flex;gap:7px;align-items:flex-start}
+.radar-check::before{content:"→";font-family:var(--mono);color:var(--teal);flex-shrink:0}
+
+/* ══ FOOTER ════════════════════════════════════════════════════════ */
+footer{border-top:1px solid var(--line);padding:2rem 3rem;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1rem}
+.footer-note{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+
+/* ══ RESPONSIVE ════════════════════════════════════════════════════ */
+@media(max-width:768px){
+  header,main,footer{padding-left:1.25rem;padding-right:1.25rem}
+  nav{padding:0 1rem}
+  h1{font-size:1.8rem}
+  .funnel-wrapper{grid-template-columns:1fr}
+  .funnel-spine{display:none}
+  .corr-item{grid-template-columns:1fr}
+  .corr-arrow{display:none}
+  .signal-strip{grid-template-columns:1fr}
+  .ga4-flow{grid-template-columns:1fr}
+  .ga4-step{border-right:none;border-bottom:1px solid var(--line)}
+  .ga4-step:last-child{border-bottom:none}
+  .metric-inputs{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <p class="eyebrow">Guia de análise · Mídia de performance</p>
+    <h1>Analytics <em>Map</em></h1>
+    <p class="header-meta">Relações entre métricas, diagnósticos e decisões de otimização.<br>Do topo ao fundo do funil, por plataforma.</p>
+  </div>
+</header>
+
+<nav id="main-nav">
+  <a href="#funil" class="active">Funil</a>
+  <a href="#decisor">Tomador de decisão</a>
+  <a href="#radar">Radar de alertas</a>
+  <a href="#macetes">GA4</a>
+  <a href="#diagnostico">Diagnóstico rápido</a>
+  <a href="#ga4">GA4</a>
+  <a href="#regras">Regras de ouro</a>
+</nav>
+
+<main>
+
+<!-- ══ 01 FUNIL ══════════════════════════════════════════════════════ -->
+<section id="funil">
+  <div class="section-header"><span class="section-tag">01</span><h2>O funil e suas métricas</h2></div>
+  <p class="section-desc">Cada estágio tem um objetivo diferente. Clique em cada etapa para ver métricas, correlações e semáforo de saúde.</p>
+
+  <div class="funnel-wrapper">
+    <div class="funnel-spine">
+      <div class="spine-stage" style="padding-top:20px">
+        <span class="spine-label topo">Topo</span><span class="spine-sub">Awareness</span>
+      </div>
+      <div class="spine-connector"><div class="spine-arrow"></div></div>
+      <div class="spine-stage"><span class="spine-label meio">Meio</span><span class="spine-sub">Consideração</span></div>
+      <div class="spine-connector"><div class="spine-arrow"></div></div>
+      <div class="spine-stage"><span class="spine-label fundo">Fundo</span><span class="spine-sub">Conversão</span></div>
+    </div>
+    <div class="funnel-cards">
+
+      <div class="stage-block" id="blk-topo">
+        <div class="stage-header" onclick="toggleStage('topo')">
+          <div class="stage-title-group">
+            <div class="stage-dot topo"></div>
+            <div><div class="stage-name">Geração de demanda & alcance</div><div class="stage-obj">Impactar o maior número de pessoas qualificadas ao menor CPM</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="stage-platforms"><span class="plat-badge pb-meta">Meta</span><span class="plat-badge pb-tiktok">TikTok</span><span class="plat-badge pb-dv360">DV360</span></div>
+            <span class="stage-toggle">+</span>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-name">Alcance</div><div class="metric-desc">Usuários únicos impactados. Queda indica saturação ou budget restritivo. Compare com a janela anterior.</div></div>
+            <div class="metric-card"><div class="metric-name">Frequência</div><div class="metric-desc">Acima de 3–4x/semana = saturação. Algoritmo paga mais pelas mesmas pessoas. Expandir audiência ou trocar criativo.</div></div>
+            <div class="metric-card"><div class="metric-name">CPM</div><div class="metric-desc">Custo por mil impressões. Sobe com leilão aquecido, criativo fraco ou audiência concorrida.</div></div>
+            <div class="metric-card"><div class="metric-name">VTR — Video Through Rate</div><div class="metric-desc">% que assistiu até o final. Abaixo de 25% nos 3s iniciais = hook fraco. Problema no criativo.</div></div>
+            <div class="metric-card"><div class="metric-name">Impression Share</div><div class="metric-desc">% do leilão que você ganha. Abaixo de 50% = perda de volume relevante.</div></div>
+            <div class="metric-card"><div class="metric-name">Lost IS por Budget</div><div class="metric-desc">% perdida por limite de verba. Budget está travando antes do lance ser um problema.</div></div>
+          </div>
+          <div class="corr-title" style="margin-bottom:6px">Correlações → decisão</div>
+          <div class="corr-plat-tabs" style="display:flex;gap:6px;margin-bottom:10px">
+            <button class="cptab sel" onclick="showCorrPlat('topo','google',this)">Google / DV360</button>
+            <button class="cptab" onclick="showCorrPlat('topo','meta',this)">Meta / TikTok</button>
+          </div>
+          <div id="cp-topo-google">
+            <div class="corr-list">
+              <div class="corr-item"><div class="corr-signal">CPM subindo + alcance caindo</div><div class="corr-arrow">→</div><div class="corr-action">Audiência saturada. Ampliar segmentação ou excluir conversores.</div></div>
+              <div class="corr-item"><div class="corr-signal">IS baixo + Lost IS budget alto</div><div class="corr-arrow">→</div><div class="corr-action">Budget sufocando. Aumentar verba antes de mexer no lance.</div></div>
+              <div class="corr-item"><div class="corr-signal">IS baixo + Lost IS rank alto</div><div class="corr-arrow">→</div><div class="corr-action">Lance insuficiente. Aumentar CPM máx ou mudar estratégia.</div></div>
+              <div class="corr-item"><div class="corr-signal">Viewability abaixo de 50% (DV360)</div><div class="corr-arrow">→</div><div class="corr-action">Ativar filtros de viewability ou migrar para inventário garantido.</div></div>
+            </div>
+          </div>
+          <div id="cp-topo-meta" style="display:none">
+            <div class="corr-list">
+              <div class="corr-item"><div class="corr-signal">Frequência > 3x + CPM subindo</div><div class="corr-arrow">→</div><div class="corr-action">Audiência saturada. Expandir segmentação ou trocar criativo.</div></div>
+              <div class="corr-item"><div class="corr-signal">VTR abaixo de 25% (TikTok)</div><div class="corr-arrow">→</div><div class="corr-action">Trocar hook do vídeo. 3s iniciais não estão prendendo.</div></div>
+              <div class="corr-item"><div class="corr-signal">Alcance estagnado + frequência subindo</div><div class="corr-arrow">→</div><div class="corr-action">Ampliar audiência ou renovar criativos.</div></div>
+              <div class="corr-item"><div class="corr-signal">CPM ok + CTR caindo no Meta</div><div class="corr-arrow">→</div><div class="corr-action">Criativo perdendo tração. Preparar novo asset.</div></div>
+            </div>
+          </div>
+          <div class="signal-strip">
+            <div class="signal-box ok"><div class="sig-label">✓ Saudável</div><div class="sig-text">CPM estável, frequência 1.5–3x, alcance crescendo</div></div>
+            <div class="signal-box warn"><div class="sig-label">⚠ Atenção</div><div class="sig-text">Frequência acima de 4x ou CPM subindo +20% sem sazonalidade</div></div>
+            <div class="signal-box bad"><div class="sig-label">✕ Agir</div><div class="sig-text">Alcance estagnado + CPM disparando. Fadiga instalada.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-block" id="blk-meio">
+        <div class="stage-header" onclick="toggleStage('meio')">
+          <div class="stage-title-group">
+            <div class="stage-dot meio"></div>
+            <div><div class="stage-name">Engajamento & intenção</div><div class="stage-obj">Qualificar o tráfego. Sinalizar intenção ao algoritmo.</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="stage-platforms"><span class="plat-badge pb-meta">Meta</span><span class="plat-badge pb-google">Google</span><span class="plat-badge pb-tiktok">TikTok</span></div>
+            <span class="stage-toggle">+</span>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-name">CTR</div><div class="metric-desc">Mede o apelo do anúncio. Abaixo de 1% em display ou 3% em search merece atenção imediata.</div></div>
+            <div class="metric-card"><div class="metric-name">CPC</div><div class="metric-desc">CPC subindo sem conversão = LP ou tráfego com qualidade baixa. Não mexa no lance antes de investigar.</div></div>
+            <div class="metric-card"><div class="metric-name">Taxa de engajamento</div><div class="metric-desc">Reações, comentários, shares. Alta taxa sinaliza ao algoritmo que o criativo ressoa e reduz CPM.</div></div>
+            <div class="metric-card"><div class="metric-name">Tempo na página (GA4)</div><div class="metric-desc">Saída em menos de 15s = usuário não leu a oferta. Problema de LP, segmentação ou desalinhamento.</div></div>
+            <div class="metric-card"><div class="metric-name">Scroll depth (GA4)</div><div class="metric-desc">Usuário que não rola não chegou à CTA. Problema de UX ou copy do headline da LP.</div></div>
+            <div class="metric-card"><div class="metric-name">Engagement Rate (GA4)</div><div class="metric-desc">Sessão engajada = +10s ou +1 pageview. Bounce acima de 70% em tráfego pago é alarme.</div></div>
+          </div>
+          <div class="corr-title" style="margin-bottom:6px">Correlações → decisão</div>
+          <div class="corr-plat-tabs" style="display:flex;gap:6px;margin-bottom:10px">
+            <button class="cptab sel" onclick="showCorrPlat('meio','google',this)">Google / Search</button>
+            <button class="cptab" onclick="showCorrPlat('meio','meta',this)">Meta / TikTok</button>
+          </div>
+          <div id="cp-meio-google">
+            <div class="corr-list">
+              <div class="corr-item"><div class="corr-signal">CTR alto + conversão zero</div><div class="corr-arrow">→</div><div class="corr-action">Problema na LP. Alinhar mensagem do criativo com a página.</div></div>
+              <div class="corr-item"><div class="corr-signal">CPC alto + CTR baixo</div><div class="corr-arrow">→</div><div class="corr-action">Criativo fraco. Testar novos copies antes de subir lance.</div></div>
+              <div class="corr-item"><div class="corr-signal">Tempo na pág &lt; 20s + alto volume</div><div class="corr-arrow">→</div><div class="corr-action">Segmentação errada. Revisar audiência e copy do anúncio.</div></div>
+              <div class="corr-item"><div class="corr-signal">Quality Score baixo + CPC alto</div><div class="corr-arrow">→</div><div class="corr-action">Melhorar relevância do anúncio e experiência na LP.</div></div>
+            </div>
+          </div>
+          <div id="cp-meio-meta" style="display:none">
+            <div class="corr-list">
+              <div class="corr-item"><div class="corr-signal">CTR alto + conversão zero</div><div class="corr-arrow">→</div><div class="corr-action">Problema na LP. Alinhar mensagem do criativo com a página.</div></div>
+              <div class="corr-item"><div class="corr-signal">Engajamento alto no Meta</div><div class="corr-arrow">→</div><div class="corr-action">Reaproveitar em retargeting de fundo de funil.</div></div>
+              <div class="corr-item"><div class="corr-signal">Tempo na pág &lt; 20s + tráfego pago</div><div class="corr-arrow">→</div><div class="corr-action">Segmentação errada ou desalinhamento criativo/LP.</div></div>
+              <div class="corr-item"><div class="corr-signal">Hook rate baixo no TikTok</div><div class="corr-arrow">→</div><div class="corr-action">Testar 3 variações do início do vídeo.</div></div>
+            </div>
+          </div>
+          <div class="signal-strip">
+            <div class="signal-box ok"><div class="sig-label">✓ Saudável</div><div class="sig-text">CTR acima de 2%, bounce abaixo de 50%, tempo médio acima de 45s</div></div>
+            <div class="signal-box warn"><div class="sig-label">⚠ Atenção</div><div class="sig-text">CPC subindo sem ganho de conversão. Investigar LP.</div></div>
+            <div class="signal-box bad"><div class="sig-label">✕ Agir</div><div class="sig-text">CTR alto + conversão zero. Desalinhamento crítico.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-block" id="blk-fundo">
+        <div class="stage-header" onclick="toggleStage('fundo')">
+          <div class="stage-title-group">
+            <div class="stage-dot fundo"></div>
+            <div><div class="stage-name">Conversão & performance</div><div class="stage-obj">É aqui que a meta é batida. CPA e ROAS são o centro.</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="stage-platforms"><span class="plat-badge pb-google">Google</span><span class="plat-badge pb-meta">Meta</span><span class="plat-badge pb-ga4">GA4</span></div>
+            <span class="stage-toggle">+</span>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-name">CPA</div><div class="metric-desc">Analisar em janela de 7–14 dias. CPA de um dia isolado é ruído, não sinal.</div></div>
+            <div class="metric-card"><div class="metric-name">ROAS</div><div class="metric-desc">Retorno sobre gasto. Se abaixo do target em janela, investigar mix, ticket médio ou LP.</div></div>
+            <div class="metric-card"><div class="metric-name">tCPA / tROAS</div><div class="metric-desc">O sinal que você dá ao algoritmo. Conservador = não escala. Agressivo = CPA estoura. Ajuste em 15–20%.</div></div>
+            <div class="metric-card"><div class="metric-name">Lost IS por Rank</div><div class="metric-desc">Acima de 40% com CPA ok = deixando escala na mesa. Aumentar tCPA.</div></div>
+            <div class="metric-card"><div class="metric-name">Lost IS por Budget</div><div class="metric-desc">Budget freando campanha com CPA saudável. Aumentar verba antes do lance.</div></div>
+            <div class="metric-card"><div class="metric-name">Volume de conversões</div><div class="metric-desc">Mínimo 30–50 conv/mês para PMax operar bem. Abaixo disso o algoritmo não tem dados suficientes.</div></div>
+          </div>
+          <div class="corr-title" style="margin-bottom:6px">Correlações → decisão</div>
+          <div class="corr-plat-tabs" style="display:flex;gap:6px;margin-bottom:10px">
+            <button class="cptab sel" onclick="showCorrPlat('fundo','google',this)">Google / DV360</button>
+            <button class="cptab" onclick="showCorrPlat('fundo','meta',this)">Meta / TikTok</button>
+          </div>
+          <div id="cp-fundo-google">
+            <div class="corr-list">
+              <div class="corr-item"><div class="corr-signal">CPA ok + IS baixo + budget sobrando</div><div class="corr-arrow">→</div><div class="corr-action">Algoritmo conservador. Aumentar tCPA em 15–20%.</div></div>
+              <div class="corr-item"><div class="corr-signal">CPA alto + Lost IS rank alto</div><div class="corr-arrow">→</div><div class="corr-action">Lance insuficiente. Aumentar tCPA e monitorar 7–10 dias.</div></div>
+              <div class="corr-item"><div class="corr-signal">CPA subindo + conv. rate caindo</div><div class="corr-arrow">→</div><div class="corr-action">Problema de LP ou oferta. Não é o anúncio.</div></div>
+              <div class="corr-item"><div class="corr-signal">CPA ok mas ROAS abaixo do target</div><div class="corr-arrow">→</div><div class="corr-action">Ticket médio caindo. Verificar mix de produtos.</div></div>
+            </div>
+          </div>
+          <div id="cp-fundo-meta" style="display:none">
+            <div class="corr-list">
+              <div class="corr-item"><div class="corr-signal">CPA alto + frequência no limite</div><div class="corr-arrow">→</div><div class="corr-action">Problema de audiência. Expandir antes de mexer no lance.</div></div>
+              <div class="corr-item"><div class="corr-signal">ROAS abaixo + CPA ok</div><div class="corr-arrow">→</div><div class="corr-action">Ticket médio caindo. Verificar mix de produtos no GA4.</div></div>
+              <div class="corr-item"><div class="corr-signal">CPA subindo + conv. rate caindo</div><div class="corr-arrow">→</div><div class="corr-action">Problema de LP ou oferta. Não é o anúncio.</div></div>
+              <div class="corr-item"><div class="corr-signal">CPA estável + volume baixo</div><div class="corr-arrow">→</div><div class="corr-action">Aumentar budget gradualmente — há margem para escalar.</div></div>
+            </div>
+          </div>
+          <div class="signal-strip">
+            <div class="signal-box ok"><div class="sig-label">✓ Saudável</div><div class="sig-text">CPA abaixo do target em 7d, budget consumindo normalmente</div></div>
+            <div class="signal-box warn"><div class="sig-label">⚠ Atenção</div><div class="sig-text">CPA + ROAS divergentes. Verificar ticket médio e mix de produtos.</div></div>
+            <div class="signal-box bad"><div class="sig-label">✕ Agir</div><div class="sig-text">CPA acima do target por mais de 10 dias consecutivos.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 TOMADOR DE DECISÃO ══════════════════════════════════════ -->
+<section id="decisor">
+  <div class="section-header"><span class="section-tag">02</span><h2>Tomador de decisão</h2></div>
+  <p class="section-desc">Configure os parâmetros da campanha e receba um diagnóstico completo com saúde, potencial de escala e otimizações recomendadas. Use as faixas percentuais para indicar a relação de cada métrica com sua meta — sem expor valores exatos.</p>
+
+  <div class="dec-shell">
+    <div class="dec-form">
+
+      <div class="dec-step" id="ds-0">
+        <div class="dec-step-header"><div class="dec-step-num">1</div><span class="dec-step-label">Plataforma</span></div>
+        <div class="btn-group">
+          <button class="dBtn" onclick="sel(this,'plat','google')">Google Ads</button>
+          <button class="dBtn" onclick="sel(this,'plat','meta')">Meta Ads</button>
+          <button class="dBtn" onclick="sel(this,'plat','tiktok')">TikTok Ads</button>
+          <button class="dBtn" onclick="sel(this,'plat','dv360')">DV360</button>
+        </div>
+      </div>
+
+      <div class="dec-step" id="ds-1">
+        <div class="dec-step-header"><div class="dec-step-num">2</div><span class="dec-step-label">Fase do funil</span></div>
+        <div class="btn-group">
+          <button class="dBtn" onclick="sel(this,'fase','topo')" data-fase="topo">Topo — Awareness</button>
+          <button class="dBtn" onclick="sel(this,'fase','meio')" data-fase="meio">Meio — Consideração</button>
+          <button class="dBtn" onclick="sel(this,'fase','fundo')" data-fase="fundo">Fundo — Conversão</button>
+        </div>
+      </div>
+
+      <div class="dec-step" id="ds-2">
+        <div class="dec-step-header"><div class="dec-step-num">3</div><span class="dec-step-label">Tipo de campanha</span></div>
+        <div class="btn-group">
+          <button class="dBtn" onclick="sel(this,'tipo','pmax')" data-tipo="pmax">Performance Max</button>
+          <button class="dBtn" onclick="sel(this,'tipo','search')" data-tipo="search">Search</button>
+          <button class="dBtn" onclick="sel(this,'tipo','display')" data-tipo="display">Display / DSA</button>
+          <button class="dBtn" onclick="sel(this,'tipo','video')" data-tipo="video">Vídeo / Reels</button>
+          <button class="dBtn" onclick="sel(this,'tipo','shopping')" data-tipo="shopping">Shopping</button>
+          <button class="dBtn" onclick="sel(this,'tipo','advantage')" data-tipo="advantage">Advantage+</button>
+        </div>
+      </div>
+
+      <div class="dec-step" id="ds-leilao">
+        <div class="dec-step-header"><div class="dec-step-num">4</div><span class="dec-step-label">Modelo de leilão</span></div>
+        <div class="btn-group">
+          <button class="dBtn" onclick="sel(this,'leilao','maxConv')" data-leilao="maxConv">Maximizar Conversões</button>
+          <button class="dBtn" onclick="sel(this,'leilao','tcpa')" data-leilao="tcpa">CPA desejado (tCPA)</button>
+          <button class="dBtn" onclick="sel(this,'leilao','troas')" data-leilao="troas">ROAS desejado (tROAS)</button>
+          <button class="dBtn" onclick="sel(this,'leilao','maxClick')" data-leilao="maxClick">Maximizar Cliques</button>
+        </div>
+      </div>
+
+      <div class="dec-step" id="ds-3">
+        <div class="dec-step-header"><div class="dec-step-num">5</div><span class="dec-step-label">Evento de conversão principal</span></div>
+        <div class="btn-group">
+          <button class="dBtn" onclick="sel(this,'conv','purchase')" data-conv="purchase">Compra / Venda</button>
+          <button class="dBtn" onclick="sel(this,'conv','lead')" data-conv="lead">Lead / Cadastro</button>
+          <button class="dBtn" onclick="sel(this,'conv','install')" data-conv="install">Instalação de app</button>
+          <button class="dBtn" onclick="sel(this,'conv','view')" data-conv="view">Visualização / Alcance</button>
+          <button class="dBtn" onclick="sel(this,'conv','cart')" data-conv="cart">Adicionar ao carrinho</button>
+        </div>
+      </div>
+
+      <div class="dec-step" id="ds-4">
+        <div class="dec-step-header"><div class="dec-step-num">6</div><span class="dec-step-label">Métricas de performance</span></div>
+        <div class="metric-inputs">
+
+          <div class="metric-input-block" id="mi-cpa">
+            <div class="mi-label">CPA</div>
+            <div class="mi-row">
+              <div class="mi-field"><span class="mi-unit">R$</span><input type="number" class="mi-inp" id="atual-cpa" placeholder="atual" oninput="calcMetric('cpa')"></div>
+              <span class="mi-slash">/</span>
+              <div class="mi-field"><span class="mi-unit">R$</span><input type="number" class="mi-inp" id="meta-cpa" placeholder="meta" oninput="calcMetric('cpa')"></div>
+            </div>
+            <div class="mi-score" id="scr-cpa"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-cpm">
+            <div class="mi-label">CPM</div>
+            <div class="mi-row">
+              <div class="mi-field"><span class="mi-unit">R$</span><input type="number" class="mi-inp" id="atual-cpm" placeholder="atual" oninput="calcMetric('cpm')"></div>
+              <span class="mi-slash">/</span>
+              <div class="mi-field"><span class="mi-unit">R$</span><input type="number" class="mi-inp" id="meta-cpm" placeholder="meta" oninput="calcMetric('cpm')"></div>
+            </div>
+            <div class="mi-score" id="scr-cpm"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-is">
+            <div class="mi-label">Lost IS</div>
+            <div class="mi-row">
+              <input type="range" class="mi-slider" id="inp-is" min="0" max="100" value="50" oninput="calcMetric('is')">
+              <span class="mi-slider-val" id="sv-is">50</span><span class="mi-unit">%</span>
+            </div>
+            <div class="mi-score" id="scr-is"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-ctr">
+            <div class="mi-label">CTR</div>
+            <div class="mi-row">
+              <input type="range" class="mi-slider" id="inp-ctr" min="0" max="100" value="50" oninput="calcMetric('ctr')">
+              <span class="mi-slider-val" id="sv-ctr">50</span>
+            </div>
+            <div class="mi-score" id="scr-ctr"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-roas" style="display:none">
+            <div class="mi-label">ROAS</div>
+            <div class="mi-row">
+              <div class="mi-field"><input type="number" class="mi-inp" id="atual-roas" placeholder="atual" step="0.1" oninput="calcMetric('roas')"><span class="mi-unit">×</span></div>
+              <span class="mi-slash">/</span>
+              <div class="mi-field"><input type="number" class="mi-inp" id="meta-roas" placeholder="meta" step="0.1" oninput="calcMetric('roas')"><span class="mi-unit">×</span></div>
+            </div>
+            <div class="mi-score" id="scr-roas"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-cpc" style="display:none">
+            <div class="mi-label">CPC</div>
+            <div class="mi-row">
+              <div class="mi-field"><span class="mi-unit">R$</span><input type="number" class="mi-inp" id="atual-cpc" placeholder="atual" oninput="calcMetric('cpc')"></div>
+              <span class="mi-slash">/</span>
+              <div class="mi-field"><span class="mi-unit">R$</span><input type="number" class="mi-inp" id="meta-cpc" placeholder="meta" oninput="calcMetric('cpc')"></div>
+            </div>
+            <div class="mi-score" id="scr-cpc"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-bdg">
+            <div class="mi-label">Budget</div>
+            <div class="mi-row">
+              <input type="range" class="mi-slider" id="inp-bdg" min="0" max="100" value="50" oninput="calcMetric('bdg')">
+              <span class="mi-slider-val" id="sv-bdg">50</span>
+            </div>
+            <div class="mi-score" id="scr-bdg"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-freq" style="display:none">
+            <div class="mi-label">Frequência</div>
+            <div class="mi-row">
+              <input type="range" class="mi-slider" id="inp-freq" min="0" max="100" value="50" oninput="calcMetric('freq')">
+              <span class="mi-slider-val" id="sv-freq">50</span>
+            </div>
+            <div class="mi-score" id="scr-freq"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-vtr" style="display:none">
+            <div class="mi-label">VTR</div>
+            <div class="mi-row">
+              <input type="range" class="mi-slider" id="inp-vtr" min="0" max="100" value="50" oninput="calcMetric('vtr')">
+              <span class="mi-slider-val" id="sv-vtr">50</span><span class="mi-unit">%</span>
+            </div>
+            <div class="mi-score" id="scr-vtr"><span class="mi-num">50</span></div>
+          </div>
+
+          <div class="metric-input-block" id="mi-eng" style="display:none">
+            <div class="mi-label">Engaj. Vídeo</div>
+            <div class="mi-row">
+              <input type="range" class="mi-slider" id="inp-eng" min="0" max="100" value="50" oninput="calcMetric('eng')">
+              <span class="mi-slider-val" id="sv-eng">50</span><span class="mi-unit">%</span>
+            </div>
+            <div class="mi-score" id="scr-eng"><span class="mi-num">50</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="dec-step" id="ds-5">
+        <div class="dec-step-header"><div class="dec-step-num">7</div><span class="dec-step-label">Última otimização realizada</span></div>
+        <div class="btn-group">
+          <button class="dBtn" onclick="sel(this,'ult','lance')">Ajuste de lance</button>
+          <button class="dBtn" onclick="sel(this,'ult','criativo')">Troca de criativo</button>
+          <button class="dBtn" onclick="sel(this,'ult','audiencia')">Mudança de audiência</button>
+          <button class="dBtn" onclick="sel(this,'ult','budget')">Ajuste de budget</button>
+          <button class="dBtn" onclick="sel(this,'ult','lp')">Mudança na LP</button>
+          <button class="dBtn" onclick="sel(this,'ult','nenhuma')">Nenhuma recente</button>
+        </div>
+      </div>
+
+      <div class="dec-step" id="ds-6">
+        <div class="dec-step-header"><div class="dec-step-num">8</div><span class="dec-step-label">Quando foi a última otimização?</span></div>
+        <div class="btn-group">
+          <button class="dBtn" onclick="sel(this,'quando','lt3d')">Menos de 3 dias</button>
+          <button class="dBtn" onclick="sel(this,'quando','lt7d')">3 a 7 dias</button>
+          <button class="dBtn" onclick="sel(this,'quando','lt14d')">7 a 14 dias</button>
+          <button class="dBtn" onclick="sel(this,'quando','gt14d')">Mais de 14 dias</button>
+        </div>
+      </div>
+
+      <button class="dec-run" id="run-btn" onclick="runDecision()" disabled>
+        Analisar campanha →
+      </button>
+    </div>
+
+    <div class="dec-result" id="dr-panel"></div>
+  </div>
+</section>
+
+<!-- ══ 03 RADAR DE ALERTAS ══════════════════════════════════════════ -->
+<section id="radar">
+  <div class="section-header"><span class="section-tag">03</span><h2>Radar de alertas</h2></div>
+  <p class="section-desc">Padrões que sinalizam campanhas que precisam de otimização. Filtre por urgência ou tipo para focar no que importa agora.</p>
+
+  <div class="radar-filters">
+    <button class="rfBtn sel" onclick="filterRadar('all',this)">Todos</button>
+    <button class="rfBtn" onclick="filterRadar('red',this)">🔴 Urgente</button>
+    <button class="rfBtn" onclick="filterRadar('amber',this)">🟡 Atenção</button>
+    <button class="rfBtn" onclick="filterRadar('purple',this)">🟣 Monitorar</button>
+    <button class="rfBtn" onclick="filterRadar('green',this)">🟢 Oportunidade</button>
+  </div>
+
+  <div class="radar-grid" id="radar-grid">
+
+    <div class="radar-card" data-sev="red">
+      <div class="radar-top"><div class="radar-dot red"></div><span class="radar-badge red">Urgente</span></div>
+      <div class="radar-title">CPA disparando sem mudança na campanha</div>
+      <div class="radar-signal">CPA alto por 7d+ · Conv. rate caindo · Budget consumindo</div>
+      <div class="radar-body">Se o anúncio não mudou, o problema é externo. LP com erro técnico, oferta desatualizada ou concorrência nova. Nunca mexa no lance como primeiro passo.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Checar conv. rate no GA4 por canal (fonte/meio)</div>
+        <div class="radar-check">Testar a LP manualmente — velocidade, formulário, preço</div>
+        <div class="radar-check">Comparar com janela equivalente do mês anterior</div>
+      </div>
+    </div>
+
+    <div class="radar-card" data-sev="red">
+      <div class="radar-top"><div class="radar-dot red"></div><span class="radar-badge red">Urgente</span></div>
+      <div class="radar-title">CTR alto com conversão próxima de zero</div>
+      <div class="radar-signal">CTR alto · Conversão ~0 · Bounce alto · Budget consumindo</div>
+      <div class="radar-body">O anúncio vende bem a promessa, mas a LP não entrega. Um dos erros mais caros: gasto em cliques que não convertem. Funil quebra entre o clique e a página.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Mensagem do anúncio bate com o headline da LP?</div>
+        <div class="radar-check">LP carrega em menos de 3s no mobile?</div>
+        <div class="radar-check">Formulário ou botão de compra funcionando?</div>
+      </div>
+    </div>
+
+    <div class="radar-card" data-sev="amber">
+      <div class="radar-top"><div class="radar-dot amber"></div><span class="radar-badge amber">Atenção</span></div>
+      <div class="radar-title">Criativo em fadiga</div>
+      <div class="radar-signal">CPM subindo · CTR caindo · Frequência alta</div>
+      <div class="radar-body">A plataforma continua entregando, mas o usuário já viu esse anúncio muitas vezes e está ignorando. Custo sobe, resultado cai. Alavanca: criativo, não lance.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Frequência acima de 3.5x/sem no Meta?</div>
+        <div class="radar-check">CTR caiu mais de 30% vs. semana 1 do criativo?</div>
+        <div class="radar-check">Testar novo hook antes de qualquer ajuste de lance</div>
+      </div>
+    </div>
+
+    <div class="radar-card" data-sev="amber">
+      <div class="radar-top"><div class="radar-dot amber"></div><span class="radar-badge amber">Atenção</span></div>
+      <div class="radar-title">Perda de IS por rank com budget disponível <span class="rb-badge" style="font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:var(--r-pill);background:var(--teal-pale);color:var(--teal);font-weight:500">Google Ads</span></div>
+      <div class="radar-signal">IS baixo · Lost IS rank alto · Budget não esgotado</div>
+      <div class="radar-body">A campanha tem verba mas perde leilões por competitividade. Lance ou QS está abaixo do necessário. Disponibilidade de budget não é o problema.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Lost IS por rank acima de 40%?</div>
+        <div class="radar-check">Quality Score dos anúncios principais</div>
+        <div class="radar-check">Considerar aumento de tCPA ou revisão de assets</div>
+      </div>
+    </div>
+
+    <div class="radar-card" data-sev="amber">
+      <div class="radar-top"><div class="radar-dot amber"></div><span class="radar-badge amber">Atenção</span></div>
+      <div class="radar-title">ROAS abaixo com CPA dentro da meta</div>
+      <div class="radar-signal">CPA ok · ROAS abaixo do target</div>
+      <div class="radar-body">Custo por conversão controlado, mas retorno em receita está baixo. Geralmente indica que produtos de menor ticket estão convertendo mais. Problema comercial, não de mídia.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Quais produtos/SKUs estão convertendo no GA4?</div>
+        <div class="radar-check">Ticket médio caiu vs. período anterior?</div>
+        <div class="radar-check">Segmentar por produto com tROAS específico</div>
+      </div>
+    </div>
+
+    <div class="radar-card" data-sev="purple">
+      <div class="radar-top"><div class="radar-dot purple"></div><span class="radar-badge purple">Monitorar</span></div>
+      <div class="radar-title">Campanha travada no aprendizado</div>
+      <div class="radar-signal">Status "Aprendizagem" persistente · Volume de conv. baixo</div>
+      <div class="radar-body">Meta e Google precisam de volume mínimo de conversões para sair do aprendizado. Edições frequentes reiniciam o ciclo. Consolide grupos, evite edições.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Meta: menos de 50 resultados em 7 dias?</div>
+        <div class="radar-check">PMax: menos de 30 conv. no mês?</div>
+        <div class="radar-check">Consolidar ad sets similares em um só</div>
+      </div>
+    </div>
+
+    <div class="radar-card" data-sev="purple">
+      <div class="radar-top"><div class="radar-dot purple"></div><span class="radar-badge purple">Monitorar</span></div>
+      <div class="radar-title">Budget consumindo muito rápido</div>
+      <div class="radar-signal">Budget esgotado antes do fim do dia · CPA alto</div>
+      <div class="radar-body">Lance agressivo demais para o budget disponível. O algoritmo gasta rápido nos melhores horários mas perde os leilões mais baratos por falta de verba.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Horário em que o budget se esgota?</div>
+        <div class="radar-check">Reduzir tCPA em 10–15% ou limitar por horário</div>
+        <div class="radar-check">Avaliar aumento de budget se CPA está dentro do target</div>
+      </div>
+    </div>
+
+    <div class="radar-card" data-sev="green">
+      <div class="radar-top"><div class="radar-dot green"></div><span class="radar-badge green">Oportunidade</span></div>
+      <div class="radar-title">Campanha com espaço de escala identificado</div>
+      <div class="radar-signal">CPA abaixo de 70% da meta · IS baixo · Budget sobrando</div>
+      <div class="radar-body">Três sinais positivos juntos: eficiência alta, baixa participação no leilão e verba disponível. Oportunidade de escala que está sendo ignorada.</div>
+      <div class="radar-checks">
+        <div class="radar-check">Aumentar tCPA em até 20% do target atual</div>
+        <div class="radar-check">Monitorar IS e conversões por 7 dias após ajuste</div>
+        <div class="radar-check">Se CPA se mantiver: novo incremento de 15–20%</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ 04 MACETES ════════════════════════════════════════════════════ -->
+<section id="macetes">
+  <div class="section-header"><span class="section-tag">04</span><h2>GA4</h2></div>
+  <p class="section-desc">Métricas de engajamento, comportamento e atribuição no GA4 para auditar a qualidade do tráfego pago.</p>
+
+  <div class="ptabs">
+    <button class="ptab active" onclick="showPlat('google',this)">Google Ads</button>
+    <button class="ptab" onclick="showPlat('meta',this)">Meta Ads</button>
+    <button class="ptab" onclick="showPlat('tiktok',this)">TikTok Ads</button>
+    <button class="ptab" onclick="showPlat('dv360',this)">DV360</button>
+  </div>
+
+  <div id="pp-google" class="p-panel active">
+    <div class="macete-grid">
+      <div class="macete-card diag"><div class="macete-tag">IS Diagnóstico</div><div class="macete-title">Lost IS: budget vs. rank</div><div class="macete-body">Se <code>Lost IS budget</code> alto → aumentar verba. Se <code>Lost IS rank</code> alto → lance ou QS baixo. Os dois juntos dão o diagnóstico completo.</div></div>
+      <div class="macete-card escala"><div class="macete-tag">PMax · Escala</div><div class="macete-title">CPA real abaixo do tCPA = oportunidade</div><div class="macete-body">Algoritmo conservador com margem. Aumentar tCPA em <code>15–20%</code> para forçar escala sem risco imediato de estourar o objetivo.</div></div>
+      <div class="macete-card alerta"><div class="macete-tag">PMax · Aprendizado</div><div class="macete-title">Mínimo 30–50 conversões/mês</div><div class="macete-body">Aguarde <code>7–10 dias</code> após qualquer alteração de lance antes de agir novamente. Intervenções precoces prolongam a instabilidade.</div></div>
+      <div class="macete-card diag"><div class="macete-tag">Search</div><div class="macete-title">Quality Score como alavanca oculta</div><div class="macete-body">QS alto = paga menos por leilão. Checar relevância do anúncio, CTR esperado e experiência na LP. QS baixo = desvantagem de preço mesmo com lance alto.</div></div>
+      <div class="macete-card criativo"><div class="macete-tag">Assets</div><div class="macete-title">Assets fracos limitam o teto</div><div class="macete-body">Assets com "Baixo desempenho" puxam a média para baixo. Trocar antes de ajustar lances. Criativo é o chão do algoritmo.</div></div>
+      <div class="macete-card escala"><div class="macete-tag">Incrementos</div><div class="macete-title">Regra dos 20%</div><div class="macete-body">Alterações acima de <code>20%</code> por vez no tCPA/tROAS forçam re-aprendizado. Incrementos menores movem o algoritmo sem instabilidade.</div></div>
+    </div>
+  </div>
+
+  <div id="pp-meta" class="p-panel">
+    <div class="macete-grid">
+      <div class="macete-card alerta"><div class="macete-tag">Fadiga</div><div class="macete-title">CPM subindo + CTR caindo</div><div class="macete-body">Criativo em fadiga. Trocar o asset antes de mexer em verba ou público. Essa sequência é quase invariável.</div></div>
+      <div class="macete-card diag"><div class="macete-tag">Frequência</div><div class="macete-title">Acima de 4x/semana = problema</div><div class="macete-body">Audiência esgotada. Ampliar segmentação, excluir conversores recentes ou ativar Advantage+ Audience para expandir automaticamente.</div></div>
+      <div class="macete-card escala"><div class="macete-tag">Advantage+</div><div class="macete-title">Menos restrição = mais espaço</div><div class="macete-body">Advantage+ Shopping geralmente vence audiências manuais em contas com bom volume de conversão. Menos limitações = mais espaço pro algoritmo.</div></div>
+      <div class="macete-card criativo"><div class="macete-tag">Criativo</div><div class="macete-title">Engajamento como proxy de qualidade</div><div class="macete-body">Alto compartilhamento = distribuição orgânica extra. Use em retargeting e dark posts. Alto engajamento → CPM cai naturalmente.</div></div>
+      <div class="macete-card diag"><div class="macete-tag">Atribuição</div><div class="macete-title">7d click + 1d view</div><div class="macete-body">Meta pode inflar conversões vs. GA4. A diferença é normal — monitore a evolução histórica, não o número absoluto.</div></div>
+      <div class="macete-card alerta"><div class="macete-tag">Aprendizado</div><div class="macete-title">~50 resultados em 7 dias</div><div class="macete-body">Qualquer alteração significativa reinicia o aprendizado. Evite editar campanhas em fase de aprendizagem.</div></div>
+    </div>
+  </div>
+
+  <div id="pp-tiktok" class="p-panel">
+    <div class="macete-grid">
+      <div class="macete-card criativo"><div class="macete-tag">Hook</div><div class="macete-title">Os primeiros 3 segundos definem tudo</div><div class="macete-body">VTR abaixo de <code>25% nos 3s</code> = hook fraco. TikTok pune criativos que não prendem com CPM mais alto. Teste o início antes de qualquer outra mudança.</div></div>
+      <div class="macete-card diag"><div class="macete-tag">Métricas nativas</div><div class="macete-title">VTR · 6s view rate · anchor rate</div><div class="macete-body"><code>VTR</code> = assistiu completo. <code>6s view rate</code> = passou do gancho. <code>Anchor rate</code> = clicou. Os três juntos mostram exatamente onde o vídeo perde o usuário.</div></div>
+      <div class="macete-card escala"><div class="macete-tag">Escala</div><div class="macete-title">Criativo novo supera ajuste de lance</div><div class="macete-body">CPA alto no TikTok quase sempre se resolve com novos vídeos. Planeje ao menos 2 novos criativos por semana em contas ativas.</div></div>
+      <div class="macete-card alerta"><div class="macete-tag">Saturação</div><div class="macete-title">Ciclo de vida: 7–14 dias</div><div class="macete-body">Criativos saturam rápido com volume alto. CPM subindo + CTR caindo = trocar o ativo, não o público nem o lance.</div></div>
+    </div>
+  </div>
+
+  <div id="pp-dv360" class="p-panel">
+    <div class="macete-grid">
+      <div class="macete-card diag"><div class="macete-tag">Inventário</div><div class="macete-title">Open Auction vs. PMP</div><div class="macete-body">Open Auction entrega volume. PMP entrega qualidade e contexto premium. CPM alto sem resultado = comparar desempenho entre os dois tipos.</div></div>
+      <div class="macete-card escala"><div class="macete-tag">Frequência</div><div class="macete-title">Controle por dispositivo</div><div class="macete-body">DV360 permite frequência por dispositivo. Em awareness, limite <code>3–5 impressões/semana</code> por usuário.</div></div>
+      <div class="macete-card criativo"><div class="macete-tag">Viewability</div><div class="macete-title">Abaixo de 50% = alerta</div><div class="macete-body">Metade das impressões não vistas. Ative filtros de viewability e prefira inventário garantido acima de 70%.</div></div>
+      <div class="macete-card alerta"><div class="macete-tag">Brand safety</div><div class="macete-title">Exclusões são obrigatórias</div><div class="macete-body">Open Auction pode entregar em inventário inadequado sem exclusões. Configure listas negativas e revise placements mensalmente.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 DIAGNÓSTICO ════════════════════════════════════════════════ -->
+<section id="diagnostico">
+  <div class="section-header"><span class="section-tag">05</span><h2>Diagnóstico rápido</h2></div>
+  <p class="section-desc">Sinal → causa → ação. Para análise diária rápida.</p>
+  <div class="dtable-wrap">
+    <table>
+      <thead><tr><th>Sinal observado</th><th>Possível causa</th><th>Ação recomendada</th><th>Onde verificar</th></tr></thead>
+      <tbody>
+        <tr><td>CPA alto por 1–3 dias</td><td class="td-s">Oscilação normal</td><td class="td-a">Aguardar. Avaliar em janela de 7 dias.</td><td class="td-w">Google / Meta — visão semanal</td></tr>
+        <tr><td>CPA alto por +10 dias</td><td class="td-s">Lance, LP ou criativo</td><td class="td-a">Investigar conv. rate no GA4. Se LP ok, revisar assets e lance.</td><td class="td-w">GA4 + plataforma</td></tr>
+        <tr><td>Budget sobrando + CPA ok</td><td class="td-s">Algoritmo conservador</td><td class="td-a">Aumentar tCPA em 15–20%.</td><td class="td-w">Google PMax / Meta</td></tr>
+        <tr><td>Lost IS rank alto + CPA ok</td><td class="td-s">Escala desperdiçada</td><td class="td-a">Aumentar tCPA gradualmente.</td><td class="td-w">Google Ads — IS</td></tr>
+        <tr><td>Lost IS budget alto</td><td class="td-s">Budget insuficiente</td><td class="td-a">Aumentar budget antes de mexer no lance.</td><td class="td-w">Google Ads — IS</td></tr>
+        <tr><td>CTR alto + conversão zero</td><td class="td-s">Desalinhamento anúncio × LP</td><td class="td-a">Alinhar mensagem criativo com a página.</td><td class="td-w">GA4 + plataforma</td></tr>
+        <tr><td>CPM subindo + CTR caindo</td><td class="td-s">Fadiga de criativo</td><td class="td-a">Trocar assets. Não mexer em audiência nem verba.</td><td class="td-w">Meta / TikTok</td></tr>
+        <tr><td>Frequência acima de 4x/sem</td><td class="td-s">Audiência saturada</td><td class="td-a">Ampliar segmentação ou trocar criativo.</td><td class="td-w">Meta Ads</td></tr>
+        <tr><td>VTR abaixo de 25%</td><td class="td-s">Hook fraco</td><td class="td-a">Testar variações do início do vídeo.</td><td class="td-w">TikTok Ads</td></tr>
+        <tr><td>CPA ok mas ROAS abaixo</td><td class="td-s">Ticket médio caindo</td><td class="td-a">Verificar mix de produtos. Problema comercial.</td><td class="td-w">GA4 — e-commerce</td></tr>
+        <tr><td>Conv. rate caiu sem mudança</td><td class="td-s">Problema de LP/oferta</td><td class="td-a">Testar LP manualmente. Checar velocidade e formulário.</td><td class="td-w">GA4 + PageSpeed</td></tr>
+        <tr><td>Campanha em aprendizado</td><td class="td-s">Volume insuficiente</td><td class="td-a">Consolidar grupos. Meta ~50 conv/7d.</td><td class="td-w">Meta / Google</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 06 GA4 ════════════════════════════════════════════════════════ -->
+<section id="ga4">
+  <div class="section-header"><span class="section-tag">06</span><h2>GA4</h2></div>
+  <p class="section-desc">Quando o CPA piora sem mudança nas campanhas, o GA4 é onde você encontra a resposta real.</p>
+  <div class="ga4-flow">
+    <div class="ga4-step"><div class="ga4-num">1</div><div class="ga4-label">Qualidade do tráfego</div><div class="ga4-metric">Engagement rate · Bounce · Tempo</div><div class="ga4-desc">Bounce alto e tempo baixo indicam segmentação errada ou desalinhamento criativo/página.</div><div class="ga4-warn">Engagement rate abaixo de 40% em tráfego pago é alerta.</div></div>
+    <div class="ga4-step"><div class="ga4-num">2</div><div class="ga4-label">Comportamento na LP</div><div class="ga4-metric">Scroll depth · Cliques na CTA</div><div class="ga4-desc">Não rolou = UX. Rolou e não clicou = copy ou oferta. Os dois eventos te dizem onde a LP quebra.</div></div>
+    <div class="ga4-step"><div class="ga4-num">3</div><div class="ga4-label">Taxa de conversão</div><div class="ga4-metric">Session conv. rate · Por canal</div><div class="ga4-desc">Pago vs. orgânico. Ambos caíram = LP. Só o pago caiu = segmentação.</div><div class="ga4-warn">Queda em todos os canais = LP. Só no pago = segmentação.</div></div>
+    <div class="ga4-step"><div class="ga4-num">4</div><div class="ga4-label">Atribuição vs. plataforma</div><div class="ga4-metric">Source/medium · Por canal</div><div class="ga4-desc">Meta e Google usam modelos favoráveis. GA4 usa último clique. Divergência vs. histórico é o sinal relevante.</div></div>
+  </div>
+</section>
+
+<!-- ══ 07 REGRAS ════════════════════════════════════════════════════ -->
+<section id="regras">
+  <div class="section-header"><span class="section-tag">07</span><h2>Regras de ouro</h2></div>
+  <p class="section-desc">Princípios que evitam os erros mais comuns na análise diária.</p>
+  <div class="rules-grid">
+    <div class="rule-card"><div class="rule-num">I</div><div><div class="rule-title">Nunca analise CPA por dia isolado</div><div class="rule-body">Avalie sempre em <strong>janela de 7 a 14 dias</strong> antes de qualquer decisão de lance.</div></div></div>
+    <div class="rule-card"><div class="rule-num">II</div><div><div class="rule-title">Diagnostique antes de otimizar</div><div class="rule-body">O problema é de <strong>campanha, criativo ou landing page?</strong> A maioria das otimizações erradas vai na direção certa, no lugar errado.</div></div></div>
+    <div class="rule-card"><div class="rule-num">III</div><div><div class="rule-title">Uma variável por vez</div><div class="rule-body">Nunca mude lance, criativo e audiência ao mesmo tempo. <strong>Você não vai saber o que funcionou.</strong></div></div></div>
+    <div class="rule-card"><div class="rule-num">IV</div><div><div class="rule-title">Incremente lances em no máximo 20%</div><div class="rule-body"><strong>Ajustes de 15–20%</strong> são suficientes para mover o algoritmo sem forçar re-aprendizado.</div></div></div>
+    <div class="rule-card"><div class="rule-num">V</div><div><div class="rule-title">Use o GA4 como árbitro</div><div class="rule-body">Quando os números da plataforma não batem com o resultado real, <strong>o GA4 tem a resposta</strong>.</div></div></div>
+    <div class="rule-card"><div class="rule-num">VI</div><div><div class="rule-title">CPA real abaixo do tCPA = escala disponível</div><div class="rule-body">Algoritmo conservador é oportunidade. <strong>Aumente o tCPA proativamente</strong> e deixe ele buscar volume.</div></div></div>
+    <div class="rule-card"><div class="rule-num">VII</div><div><div class="rule-title">Criativo é a maior alavanca no topo</div><div class="rule-body"><strong>Nenhuma otimização de lance supera um bom criativo</strong> no Meta e TikTok.</div></div></div>
+    <div class="rule-card"><div class="rule-num">VIII</div><div><div class="rule-title">Respeite o período de aprendizado</div><div class="rule-body">Toda alteração significativa reinicia o aprendizado. <strong>Evite editar</strong> campanhas em aprendizado.</div></div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span class="footer-note">Analytics Map · Análise de performance · Uso interno</span>
+</footer>
+
+<script>
+/* ══ STATE ══════════════════════════════════════════════════════════ */
+const S = {cpa:50,cpm:50,is:50,ctr:50,bdg:50,freq:50,roas:50,cpc:50,vtr:50,eng:50};
+const REQUIRED = ['plat','fase','tipo','leilao','conv','ult','quando'];
+
+/* ══ FILTERS (cascading) ═══════════════════════════════════════════ */
+const FILTERS = {
+  platToTipo: {
+    google:   ['pmax','search','display','video','shopping'],
+    meta:     ['video','advantage'],
+    tiktok:   ['video'],
+    dv360:    ['display','video'],
+  },
+  platToLeilao: {
+    google:   ['maxConv','tcpa','troas','maxClick'],
+    meta:     ['maxConv','tcpa','troas'],
+    tiktok:   ['maxConv','tcpa'],
+    dv360:    ['maxConv','tcpa'],
+  },
+  tipoToFase: {
+    pmax:     ['meio','fundo'],
+    search:   ['meio','fundo'],
+    display:  ['topo','meio'],
+    video:    ['topo','meio'],
+    shopping: ['fundo'],
+    advantage:['meio','fundo'],
+  },
+  tipoToConv: {
+    pmax:     ['purchase','lead'],
+    search:   ['purchase','lead','cart'],
+    display:  ['view','lead'],
+    video:    ['view','install'],
+    shopping: ['purchase','cart'],
+    advantage:['purchase','lead'],
+  },
+  leilaoToMetrics: {
+    maxConv:  ['cpa','cpm','is','ctr','bdg','freq','vtr','eng'],
+    tcpa:     ['cpa','cpm','is','ctr','bdg','freq','vtr','eng'],
+    troas:    ['roas','cpm','is','ctr','bdg','freq','vtr','eng'],
+    maxClick: ['cpc','cpm','is','ctr','bdg','freq','vtr','eng'],
+  },
+};
+
+/* ══ METRIC CONFIG (exact values → score 0-100) ══════════════════ */
+const METRICS_CONFIG = {
+  cpa:  { label:'CPA',  unit:'R$', better:'lower', mode:'dual' },
+  cpm:  { label:'CPM',  unit:'R$', better:'higher',mode:'dual' },
+  is:   { label:'Lost IS',unit:'', better:'higher',mode:'slider' },
+  ctr:  { label:'CTR',  unit:'',   better:'higher',mode:'single' },
+  roas: { label:'ROAS', unit:'×',  better:'higher',mode:'dual' },
+  cpc:  { label:'CPC',  unit:'R$', better:'lower', mode:'dual' },
+  bdg:  { label:'Budget',unit:'',  better:'higher',mode:'slider' },
+  freq: { label:'Frequência',unit:'',better:'higher',mode:'single' },
+  vtr:  { label:'VTR',  unit:'%',  better:'higher',mode:'single' },
+  eng:  { label:'Engaj.Vídeo',unit:'%',better:'higher',mode:'single' },
+};
+
+function calcMetric(key) {
+  const cfg = METRICS_CONFIG[key];
+  let score;
+
+  if (cfg.mode === 'dual') {
+    const atual = parseFloat(document.getElementById('atual-' + key).value) || 0;
+    const metaEl = document.getElementById('meta-' + key);
+    const meta  = parseFloat(metaEl.value) || 0;
+    const metaDisabled = metaEl && metaEl.disabled;
+    score = 50;
+    if (!metaDisabled && atual > 0 && meta > 0) {
+      score = cfg.better === 'lower'
+        ? Math.min(Math.round(meta / atual * 100), 100)
+        : Math.min(Math.round(atual / meta * 100), 100);
+    }
+  } else if (cfg.mode === 'slider') {
+    const val = parseInt(document.getElementById('inp-' + key).value) || 0;
+    score = key === 'is' ? 100 - val : val; // Lost IS inverted
+  } else { // single
+    score = parseInt(document.getElementById('inp-' + key).value) || 0;
+    if (score > 100) score = 100;
+    if (score < 0) score = 0;
+  }
+
+  S[key] = score;
+
+  const el = document.getElementById('scr-' + key);
+  if (!el) return;
+  el.querySelector('.mi-num').textContent = score;
+  el.className = 'mi-score';
+  if (score >= 80) el.classList.add('mi-green');
+  else if (score >= 50) el.classList.add('mi-amber');
+  else el.classList.add('mi-red');
+
+  // update slider display value
+  if (cfg.mode === 'slider' || cfg.mode === 'single') {
+    const sv = document.getElementById('sv-' + key);
+    if (sv) sv.textContent = document.getElementById('inp-' + key).value || 50;
+  }
+
+  checkReady();
+}
+
+/* ══ BTN SELECT ════════════════════════════════════════════════════ */
+function sel(btn, grp, val) {
+  btn.closest('.btn-group').querySelectorAll('.dBtn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  S[grp] = val;
+
+  // mark step done
+  const stepMap = {plat:'ds-0',fase:'ds-1',tipo:'ds-2',leilao:'ds-leilao',conv:'ds-3',ult:'ds-5',quando:'ds-6'};
+  if(stepMap[grp]) document.getElementById(stepMap[grp]).classList.add('done');
+
+  applyFilters();
+  checkReady();
+}
+
+function checkReady() {
+  const ok = REQUIRED.every(k => S[k]);
+  document.getElementById('run-btn').disabled = !ok;
+  document.getElementById('ds-4').classList.add('done'); // metrics always "done"
+}
+
+/* ══ CASCADING FILTERS ════════════════════════════════════════════ */
+function clearSelection(grp, stepId) {
+  delete S[grp];
+  const step = document.getElementById(stepId);
+  if(step) step.classList.remove('done');
+  const btnGroup = step ? step.querySelector('.btn-group') : null;
+  if(btnGroup) btnGroup.querySelectorAll('.dBtn').forEach(b => b.classList.remove('sel'));
+}
+
+function applyFilters() {
+  const plat = S.plat;
+
+  // 1. Platform → Campaign Types
+  if(plat && FILTERS.platToTipo[plat]) {
+    const tipos = FILTERS.platToTipo[plat];
+    document.querySelectorAll('[data-tipo]').forEach(b => {
+      const show = tipos.includes(b.dataset.tipo);
+      b.style.display = show ? '' : 'none';
+      if(!show && b.classList.contains('sel')) clearSelection('tipo','ds-2');
+    });
+  } else {
+    document.querySelectorAll('[data-tipo]').forEach(b => b.style.display = '');
+  }
+
+  // 2. Platform → Bidding Strategy
+  if(plat && FILTERS.platToLeilao[plat]) {
+    const leilaoOptions = FILTERS.platToLeilao[plat];
+    document.querySelectorAll('[data-leilao]').forEach(b => {
+      const show = leilaoOptions.includes(b.dataset.leilao);
+      b.style.display = show ? '' : 'none';
+      if(!show && b.classList.contains('sel')) clearSelection('leilao','ds-leilao');
+    });
+  } else {
+    document.querySelectorAll('[data-leilao]').forEach(b => b.style.display = '');
+  }
+
+  // read tipo fresh after it may have been cleared above
+  const tipo = S.tipo;
+
+  // 2. Campaign Type → Funnel Phases
+  if(tipo && FILTERS.tipoToFase[tipo]) {
+    const fases = FILTERS.tipoToFase[tipo];
+    document.querySelectorAll('[data-fase]').forEach(b => {
+      const show = fases.includes(b.dataset.fase);
+      b.style.display = show ? '' : 'none';
+      if(!show && b.classList.contains('sel')) clearSelection('fase','ds-1');
+    });
+  } else {
+    document.querySelectorAll('[data-fase]').forEach(b => b.style.display = '');
+  }
+
+  // 3. Campaign Type → Conversion Events
+  if(tipo && FILTERS.tipoToConv[tipo]) {
+    const convs = FILTERS.tipoToConv[tipo];
+    document.querySelectorAll('[data-conv]').forEach(b => {
+      const show = convs.includes(b.dataset.conv);
+      b.style.display = show ? '' : 'none';
+      if(!show && b.classList.contains('sel')) clearSelection('conv','ds-3');
+    });
+  } else {
+    document.querySelectorAll('[data-conv]').forEach(b => b.style.display = '');
+  }
+
+  // 4. Bidding Strategy → Metrics visibility
+  const leilao = S.leilao;
+  if(leilao && FILTERS.leilaoToMetrics[leilao]) {
+    const metrics = FILTERS.leilaoToMetrics[leilao];
+    document.querySelectorAll('.metric-input-block').forEach(el => {
+      const key = el.id && el.id.replace('mi-','');
+      if(!key) return;
+      el.style.display = metrics.includes(key) ? '' : 'none';
+    });
+    // CPA meta: disable when maxConv
+    const cpaMeta = document.getElementById('meta-cpa');
+    if (cpaMeta) {
+      if (leilao === 'maxConv') {
+        cpaMeta.disabled = true;
+        cpaMeta.placeholder = 'sem meta';
+      } else {
+        cpaMeta.disabled = false;
+        cpaMeta.placeholder = 'meta';
+      }
+    }
+  }
+
+  // 5. Platform → Frequency visibility
+  const showFreq = ['meta','tiktok'].includes(plat) && (leilao ? FILTERS.leilaoToMetrics[leilao]?.includes('freq') : true);
+  const freqEl = document.getElementById('mi-freq');
+  if(freqEl) freqEl.style.display = showFreq ? '' : 'none';
+
+  // 6. Platform → IS visibility (only Google/DV360)
+  const showIS = ['google','dv360'].includes(plat);
+  const isEl = document.getElementById('mi-is');
+  if(isEl) isEl.style.display = showIS ? '' : 'none';
+
+  // 7. Video metrics visibility
+  const isVideo = tipo === 'video';
+  ['mi-vtr','mi-eng'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isVideo ? '' : 'none';
+  });
+}
+
+/* ══ TOGGLE FUNNEL ══════════════════════════════════════════════════════ */
+function toggleStage(s) {
+  const blk = document.getElementById('blk-' + s);
+  blk.classList.toggle('open');
+}
+
+/* ══ PLATFORM TABS ══════════════════════════════════════════════════ */
+function showPlat(id, btn) {
+  document.querySelectorAll('.p-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  document.getElementById('pp-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showCorrPlat(stage, id, btn) {
+  ['google','meta'].forEach(p => {
+    const el = document.getElementById('cp-' + stage + '-' + p);
+    if (el) el.style.display = p === id ? '' : 'none';
+  });
+  btn.closest('.corr-plat-tabs').querySelectorAll('.cptab').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+/* ══ RADAR FILTER ═══════════════════════════════════════════════════════ */
+function filterRadar(sev, btn) {
+  document.querySelectorAll('.rfBtn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.querySelectorAll('.radar-card').forEach(c => {
+    if(sev === 'all' || c.dataset.sev === sev) c.classList.remove('hidden');
+    else c.classList.add('hidden');
+  });
+}
+
+/* ══ NAV SCROLL ═════════════════════════════════════════════════════ */
+const navLinks = document.querySelectorAll('nav a');
+const obsOpts = {rootMargin:'-30% 0px -60% 0px'};
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const lnk = document.querySelector(`nav a[href="#${e.target.id}"]`);
+      if(lnk) lnk.classList.add('active');
+    }
+  });
+}, obsOpts);
+document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+
+/* ══ DECISION ENGINE ════════════════════════════════════════════════ */
+function runDecision() {
+  const {plat, fase, tipo, leilao, conv, ult, quando, cpa, cpm, is: is_, ctr, bdg, freq, roas, cpc} = S;
+
+  const platName = {google:'Google Ads',meta:'Meta Ads',tiktok:'TikTok Ads',dv360:'DV360'}[plat];
+  const faseNome = {topo:'Topo (Awareness)',meio:'Meio (Consideração)',fundo:'Fundo (Conversão)'}[fase];
+  const tipoNome = {pmax:'Performance Max',search:'Search',display:'Display/DSA',video:'Vídeo/Reels',shopping:'Shopping',advantage:'Advantage+'}[tipo];
+  const convNome = {purchase:'Compra/Venda',lead:'Lead/Cadastro',install:'Instalação',view:'Visualização/Alcance',cart:'Adicionar ao carrinho'}[conv];
+  const leilaoNome = {maxConv:'Maximizar Conversões',tcpa:'CPA desejado (tCPA)',troas:'ROAS desejado (tROAS)',maxClick:'Maximizar Cliques'}[leilao];
+  const ultNome  = {lance:'ajuste de lance',criativo:'troca de criativo',audiencia:'mudança de audiência',budget:'ajuste de budget',lp:'mudança na LP',nenhuma:'nenhuma otimização recente'}[ult];
+  const quandoNome = {lt3d:'menos de 3 dias',lt7d:'3 a 7 dias',lt14d:'7 a 14 dias',gt14d:'mais de 14 dias'}[quando];
+  const showFreq = ['meta','tiktok'].includes(plat);
+
+  // ── Todas as métricas: 0 = péssimo, 50 = na meta, 100 = excelente ──
+  const good  = v => v >= 50;
+  const great = v => v >= 75;
+  const bad   = v => v < 50;
+  const crit  = v => v < 25;
+
+  const cpaGood   = good(cpa);
+  const cpaGreat  = great(cpa);
+  const cpaBad    = bad(cpa);
+  const cpmBad    = bad(cpm);
+  const isGood    = ['google','dv360'].includes(plat) && good(is_);
+  const isBad     = ['google','dv360'].includes(plat) && bad(is_);
+  const ctrGood   = good(ctr);
+  const ctrBad    = bad(ctr);
+  const bdgSurplus = bdg >= 50;  // at target or under-budget
+  const bdgOverspent = bad(bdg);
+
+  // ── SCORE: 0-100 ponderado por fase + estratégia de lance ──
+  const pesos = fase === 'topo'
+    ? { cpa:0.10, cpm:0.40, is:0.20, ctr:0.20, bdg:0.10, roas:0, cpc:0 }
+    : fase === 'meio'
+      ? { cpa:0.20, cpm:0.10, is:0.20, ctr:0.40, bdg:0.10, roas:0, cpc:0 }
+      : { cpa:0.40, cpm:0.05, is:0.10, ctr:0.30, bdg:0.15, roas:0, cpc:0 };
+
+  if (leilao === 'maxConv')   { pesos.bdg = 0.25; pesos.cpa = 0.10; }
+  else if (leilao === 'troas') { pesos.roas = 0.25; pesos.cpa = 0; }
+  else if (leilao === 'maxClick') { pesos.cpc = 0.20; pesos.cpa = 0.05; }
+
+  // platform-based adjustments
+  if (['meta','tiktok'].includes(plat)) {
+    pesos.is = 0;
+    pesos.freq = Math.max(pesos.freq || 0, 0.15);
+    pesos.cpm = (pesos.cpm || 0) + 0.10;
+  }
+
+  // video metrics adjustments
+  if (tipo === 'video') {
+    pesos.vtr = 0.25;
+    pesos.eng = 0.10;
+    pesos.cpm = (pesos.cpm || 0) + 0.10;
+    pesos.ctr = (pesos.ctr || 0) - 0.10;
+    pesos.is = 0;
+  }
+
+  const totalW = Object.values(pesos).reduce((a,b) => a+b, 0);
+  for (let k in pesos) pesos[k] /= totalW;
+
+  let score = 0;
+  for (let k in pesos) score += pesos[k] * (S[k] !== undefined ? S[k] : 0);
+  score = Math.round(score);
+
+  // ── SAÚDE ──
+  let saudeClass, saudeLabel;
+  if (score >= 70)      { saudeClass = 'ok';   saudeLabel = '✓ Saudável'; }
+  else if (score >= 40) { saudeClass = 'warn'; saudeLabel = '⚠ Atenção'; }
+  else                  { saudeClass = 'bad';  saudeLabel = '✕ Crítico'; }
+
+  // ── ESCALA (adaptada à estratégia de lance) ──
+  let scaleClass, scaleLabel;
+  if (leilao === 'maxConv') {
+    if (bdgSurplus && isBad) { scaleClass = 'scale'; scaleLabel = '↑ Escalar — aumentar budget'; }
+    else if (bdgOverspent && cpaBad) { scaleClass = 'brake'; scaleLabel = '↓ Conter — budget acabando com CPA alto'; }
+    else { scaleClass = 'hold'; scaleLabel = '→ Manter e monitorar'; }
+  } else if (leilao === 'troas') {
+    const roasGood = good(roas), roasBad = bad(roas);
+    if (roasGood && isBad && bdgSurplus) { scaleClass = 'scale'; scaleLabel = '↑ Escalar — reduzir tROAS'; }
+    else if (roasBad) { scaleClass = 'brake'; scaleLabel = '↓ Conter — ROAS abaixo da meta'; }
+    else { scaleClass = 'hold'; scaleLabel = '→ Manter e monitorar'; }
+  } else if (leilao === 'maxClick') {
+    const cpcGood = good(cpc), cpcBad = bad(cpc);
+    if (cpcGood && isBad && bdgSurplus) { scaleClass = 'scale'; scaleLabel = '↑ Escalar — aumentar CPC máximo'; }
+    else if (cpcBad) { scaleClass = 'brake'; scaleLabel = '↓ Conter — CPC acima do desejado'; }
+    else { scaleClass = 'hold'; scaleLabel = '→ Manter e monitorar'; }
+  } else { // tcpa
+    if (cpaGood && isBad && bdgSurplus) { scaleClass = 'scale'; scaleLabel = '↑ Escalar — aumentar tCPA'; }
+    else if (cpaBad && isGood) { scaleClass = 'brake'; scaleLabel = '↓ Conter — CPA acima da meta'; }
+    else { scaleClass = 'hold'; scaleLabel = '→ Manter e monitorar'; }
+  }
+
+  // ── HEADLINE ──
+  const mainBad = leilao === 'troas' ? bad(roas) : leilao === 'maxClick' ? bad(cpc) : cpaBad;
+  const headline = score >= 70 && scaleClass === 'scale'
+    ? 'Campanha eficiente e subutilizada — há espaço de escala sem risco.'
+    : score >= 70
+      ? 'Campanha em bom equilíbrio entre eficiência e volume.'
+      : score >= 40 && mainBad && isBad
+        ? `${leilao === 'troas' ? 'ROAS baixo' : leilao === 'maxClick' ? 'CPC alto' : 'CPA elevado'} e entrega baixa — investigar causa raiz antes de ajustar.`
+        : score < 40
+          ? 'Múltiplos indicadores no vermelho — agir em várias frentes.'
+          : 'Campanha em zona intermediária — aguardar mais dados antes de agir.';
+
+  // ── RELAÇÃO ENTRE MÉTRICAS ──
+  const statusLabel = v =>
+    v >= 100 ? 'Excelente ✓' :
+    v >= 75  ? 'Bom ✓' :
+    v >= 50  ? 'Na meta' :
+    v >= 25  ? 'Atenção ✗' :
+               'Crítico ✗';
+
+  let relacao = `Você está analisando uma campanha de <strong>${tipoNome}</strong> no <strong>${platName}</strong>, fase <strong>${faseNome}</strong>, modelo <strong>${leilaoNome}</strong>, com foco em <strong>${convNome}</strong>. `;
+
+  relacao += `<strong>Score de saúde:</strong> ${score}/100.`;
+  relacao += `<br><br>📊 <strong>Estratégia de lance:</strong> ${leilaoNome}. `;
+
+  if(leilao === 'maxConv') {
+    relacao += 'Neste modelo, o algoritmo prioriza volume de conversões dentro do budget. Oscilações de CPA são esperadas — avalie em janela de 7 dias. O budget é a principal alavanca de escala, não o lance.';
+  } else if(leilao === 'tcpa') {
+    relacao += 'Neste modelo, o algoritmo trabalha para manter o CPA próximo do target definido. Se o CPA está acima da meta, o target pode estar muito baixo ou há um problema estrutural (LP/concorrência). Ajustes de 15-20% no tCPA são a alavanca primária.';
+  } else if(leilao === 'troas') {
+    relacao += 'Neste modelo, o algoritmo otimiza para retorno sobre gasto. Se o ROAS está abaixo do target, verifique ticket médio e mix de produtos. Aumente o tROAS gradualmente se a eficiência permitir.';
+  } else if(leilao === 'maxClick') {
+    relacao += 'Neste modelo, o foco é gerar cliques ao menor custo. A taxa de conversão (CVR) tende a ser mais importante que o CPA isolado. Monitore o comportamento pós-clique no GA4.';
+  }
+
+  relacao += `<br><br>`;
+  const isPlat = ['google','dv360'].includes(plat);
+  const showMetric = key => {
+    if (key === 'is' && !isPlat) return false;
+    if (key === 'freq' && !['meta','tiktok'].includes(plat)) return false;
+    if (['vtr','eng'].includes(key) && tipo !== 'video') return false;
+    return FILTERS.leilaoToMetrics[leilao]?.includes(key) ?? true;
+  };
+
+  if (showMetric('cpa')) {
+    relacao += `<strong>CPA:</strong> ${cpa}% — ${statusLabel(cpa)}. `;
+  }
+  if (showMetric('roas')) {
+    relacao += `<strong>ROAS:</strong> ${roas}% — ${statusLabel(roas)}. `;
+  }
+  if (showMetric('cpc')) {
+    relacao += `<strong>CPC:</strong> ${cpc}% — ${statusLabel(cpc)}. `;
+  }
+  if (showMetric('cpm')) { relacao += `<strong>CPM:</strong> ${cpm}% — ${statusLabel(cpm)}. `; }
+  if (showMetric('is')) { relacao += `<strong>Lost IS:</strong> ${is_}% — ${statusLabel(is_)}. `; }
+  if (showMetric('ctr')) relacao += `<strong>CTR:</strong> ${ctr}% — ${statusLabel(ctr)}. `;
+  if (showMetric('bdg')) relacao += `<strong>Budget:</strong> ${bdg}% — ${statusLabel(bdg)}. `;
+  if (showMetric('vtr')) relacao += `<strong>VTR:</strong> ${vtr}% — ${statusLabel(vtr)}. `;
+  if (showMetric('eng')) relacao += `<strong>Engaj. Vídeo:</strong> ${eng}% — ${statusLabel(eng)}. `;
+
+  if (showFreq && freq !== undefined && showMetric('freq')) {
+    relacao += `<br><br><strong>Frequência:</strong> ${freq}% — ${statusLabel(freq)}. `;
+  }
+
+  if (cpmBad && ctrBad) {
+    relacao += '<br><br>🔥 <strong>Sinal de fadiga:</strong> CPM alto + CTR baixo. Criativo cansado — troque o asset antes de qualquer ajuste de lance.';
+  }
+
+  // ── ALERTA DE APRENDIZADO ──
+  let aprendWarn = '';
+  const recente = ['lt3d','lt7d'].includes(quando);
+  if (recente) {
+    const dias = quando === 'lt3d' ? '3–7' : '2–5';
+    aprendWarn = `<div class="dr-warn-box">⏳ Última otimização (<strong>${ultNome}</strong>) foi há <strong>${quandoNome}</strong>. O algoritmo ainda está absorvendo a mudança. Aguarde mais ${dias} dias antes de nova intervenção, a menos que os indicadores piorem rapidamente.</div>`;
+  }
+
+  // ── AÇÕES ──
+  const acoes = [];
+
+  if (cpaGood && isBad && bdgSurplus && plat === 'google') {
+    if (leilao === 'tcpa') acoes.push('Aumentar <strong>tCPA em 15–20%</strong> — você tem margem e o algoritmo está conservador');
+    else if (leilao === 'maxConv') acoes.push('Aumentar o <strong>budget em 15-20%</strong> — em Maximizar Conversões o budget é a alavanca de escala');
+    else acoes.push('Aumentar <strong>lance ou budget</strong> gradualmente — você tem margem para escalar');
+    acoes.push('Verificar Lost IS por rank no relatório de IS — se alto, confirma que o lance é o limitador');
+    acoes.push('Acompanhar volume de conversões e IS por 7–10 dias após o ajuste');
+  }
+  if (cpaGood && isBad && bdgSurplus && plat === 'meta') {
+    acoes.push('Considerar aumentar o orçamento ou expandir o público para dar mais volume');
+    acoes.push('Verificar se Advantage+ Audience está ativo — ajuda o algoritmo a expandir com eficiência');
+    acoes.push('Checar se a frequência está muito baixa (abaixo de 1x) — audiência pode estar pequena demais');
+  }
+  if (cpaGood && isBad && plat === 'tiktok') {
+    acoes.push('Testar novo criativo para ver se o volume aumenta — TikTok responde mais a criativo do que a lance');
+    acoes.push('Aumentar o orçamento gradualmente e monitorar VTR e conv. rate');
+  }
+  if (cpmBad && ctrBad) {
+    acoes.push('Criativo em fadiga — trocar assets antes de qualquer ajuste de lance');
+    if (plat === 'tiktok') acoes.push('No TikTok: focar no hook dos primeiros 3 segundos — 80% do CTR depende disso');
+  }
+  if (ctrBad) {
+    acoes.push('Renovar criativos — CTR abaixo do benchmark indica que o anúncio não está gerando interesse suficiente');
+  }
+  if (cpaBad && isGood) {
+    if (!recente && leilao === 'tcpa') acoes.push('Reduzir tCPA em 10-15% se CPA persistir acima do target por mais de 10 dias');
+    if (!recente && leilao === 'maxConv') acoes.push('Reduzir budget em 10-15% para conter gasto enquanto investiga a causa do CPA alto');
+    acoes.push('Verificar se houve mudança externa: concorrência, sazonalidade, ajuste de preço');
+    acoes.push('Testar LP manualmente — checar formulário, preço exibido, velocidade de carregamento');
+  }
+  if (cpaBad && isBad) {
+    acoes.push('Não aumentar lance ainda — diagnosticar se o problema é de LP ou criativo antes');
+    acoes.push('Assets fracos podem limitar quais leilões a plataforma entra. Revisar qualidade dos assets.');
+  }
+  if (bdgSurplus && cpaGood && isGood) {
+    acoes.push('Budget sobrando com eficiência ok — considerar redistribuir para ampliar alcance ou horários');
+  }
+  if (bdgOverspent && cpaBad) {
+    acoes.push('Budget sendo consumido rápido com CPA alto — reduzir ou pausar para conter prejuízo');
+  }
+  if (plat === 'google' && tipo === 'pmax') {
+    acoes.push('Conferir relatório de grupos de ativos — assets com "Baixo desempenho" limitam o teto da campanha');
+  }
+  if (ult !== 'nenhuma' && recente) {
+    acoes.push(`Última ação foi <strong>${ultNome}</strong> — evite sobrepor outra otimização antes de o algoritmo estabilizar`);
+  }
+
+  // ── Bidding-specific actions ──
+  if (leilao === 'maxConv' && cpaGood && isBad && bdgSurplus) {
+    acoes.push('Como está em <strong>Maximizar Conversões</strong>: aumente o budget em vez do lance — o algoritmo já busca máximo volume');
+    acoes.push('Monitore o CPA nos próximos 7 dias — se subir, o aumento de budget encontrou o limite do leilão');
+  }
+  if (leilao === 'maxConv' && bdgOverspent && cpaBad) {
+    acoes.push('Budget acabando com CPA elevado em <strong>Maximizar Conversões</strong> — reduza o budget em 20% e reavalie');
+  }
+  if (leilao === 'tcpa' && cpaGood && isBad && bdgSurplus) {
+    acoes.push('Como está em <strong>CPA desejado</strong>: aumente o tCPA em 15-20% para destravar escala — o algoritmo está conservador');
+  }
+  if (leilao === 'tcpa' && cpaBad && !recente) {
+    acoes.push('Seu tCPA pode estar muito baixo para o leilão atual — considere aumentar 15-20% e reavaliar em 7 dias');
+  }
+  if (leilao === 'troas' && good(roas) && isBad && bdgSurplus) {
+    acoes.push('ROAS acima da meta com entrega baixa — considere <strong>reduzir o tROAS gradualmente</strong> para destravar volume');
+  }
+  if (leilao === 'troas' && bad(roas) && !recente) {
+    acoes.push('ROAS abaixo da meta — verifique ticket médio, mix de produtos; considere aumentar tROAS ou migrar para Maximizar Conversões');
+  }
+  if (leilao === 'maxClick' && good(cpc) && isBad && bdgSurplus) {
+    acoes.push('CPC bom com entrega baixa — aumente o <strong>CPC máximo em 10-15%</strong> ou revise a segmentação para ampliar alcance');
+  }
+  if (leilao === 'maxClick' && bad(cpc)) {
+    acoes.push('CPC acima do desejado — revise palavras-chave, audiências e qualidade do anúncio antes de aumentar o lance');
+  }
+
+  // video-specific actions
+  if (tipo === 'video') {
+    if (bad(vtr)) acoes.push('VTR abaixo do esperado — revise o hook nos primeiros 3s e o storytelling do vídeo. Teste diferentes formatos (9:16 vs 1:1).');
+    if (bad(eng) && bad(vtr)) acoes.push('Engajamento e VTR baixos indicam que o vídeo não está segurando a audiência — considere um novo criativo antes de ajustar lance');
+    if (good(vtr) && good(eng)) acoes.push('VTR e engajamento saudáveis — o criativo está performando. Monitore CTR e CPA para garantir que o vídeo está convertendo.');
+    if (bad(cpm) && tipo === 'video') acoes.push('CPM elevado em campanha de vídeo — pode indicar concorrência alta no inventário ou segmentação restrita. Considere expandir público.');
+  }
+
+  if (acoes.length === 0) {
+    const monMetric = leilao === 'troas' ? 'ROAS' : leilao === 'maxClick' ? 'CPC' : 'CPA';
+    acoes.push(`Campanha estável. Monitorar ${monMetric} e IS em janela de 7 dias antes de qualquer intervenção.`);
+    acoes.push('Comparar com a semana anterior para identificar tendência (melhora ou deterioração).');
+  }
+
+  // ── TIPS ──
+  const tips = [];
+  if (leilao === 'maxConv') {
+    tips.push({t:'Maximizar Conversões',b:'CPA pode variar +-30% sem ser alarme. Avalie sempre em janela de 7 dias. Budget é a alavanca de escala.'});
+    tips.push({t:'CPA sem meta',b:'Você não definiu um tCPA — o slider CPA mede seu nível de satisfação com o custo atual. Se estiver baixo (0-25%), reveja a eficiência mesmo sem meta formal.'});
+  }
+  if (leilao === 'tcpa') {
+    tips.push({t:'CPA desejado (tCPA)',b:'Ajustes acima de 20% forçam re-aprendizado. Incrementos de 15% são ideais para mover o algoritmo sem instabilidade.'});
+  }
+  if (leilao === 'troas') {
+    tips.push({t:'ROAS desejado (tROAS)',b:'Funciona melhor com +30 conversões/mês. Abaixo disso, prefira Maximizar Conversões com monitoramento de ROAS no GA4.'});
+    tips.push({t:'ROAS vs. CPA',b:'Em tROAS, foque no ROAS em vez do CPA. Um CPA alto com ROAS bom pode indicar ticket médio elevado — não é necessariamente ruim.'});
+  }
+  if (leilao === 'maxClick') {
+    tips.push({t:'Maximizar Cliques',b:'CPA tende a ser maior e CVR mais baixa nesse modelo. Avalie métricas de engajamento pós-clique no GA4 antes de concluir sobre performance.'});
+  }
+  if (plat === 'google' && tipo === 'pmax') {
+    tips.push({t:'Sinais de audiência',b:'Adicione listas de remarketing e clientes como sinais — o PMax usa para prospectar similares.'});
+    tips.push({t:'Janela mínima',b:'PMax precisa de 30–50 conv./mês para otimizar. Um dia ruim é sempre ruído.'});
+  }
+  if (plat === 'meta') {
+    tips.push({t:'Creative refresh',b:'No Meta, a vida útil de um criativo é 7–14 dias com volume alto. Planeje rotação constante.'});
+    tips.push({t:'Dark post',b:'Anúncios com alto engajamento orgânico performam melhor quando impulsionados. Use o post ID original.'});
+  }
+  if (plat === 'tiktok') {
+    tips.push({t:'Hook nos 3s',b:'Teste pelo menos 3 versões do hook. A abertura define 80% do resultado no TikTok.'});
+    tips.push({t:'UGC converte mais',b:'Conteúdo que parece orgânico (UGC) tende a ter VTR e CTR maiores que produções polidas.'});
+  }
+  if (fase === 'fundo' && conv === 'purchase') {
+    tips.push({t:'ROAS vs. CPA',b:'Se ROAS abaixo com CPA ok: ticket médio caindo. Checar mix de produtos no GA4.'});
+  }
+  if (cpaGreat && isBad && bdgSurplus) {
+    tips.push({t:'Checklist de escala',b:'Antes de escalar: (1) LP estável, (2) conversões &gt; 30/mês, (3) criativo com &lt; 7 dias de uso.'});
+  }
+
+  // ── RENDER ──
+  const tipsHtml = tips.length ? `
+    <div class="dr-section">
+      <div class="dr-sec-title">💡 Macetes para esse cenário</div>
+      <div class="dr-tips">
+        ${tips.map(t => `<div class="dr-tip"><div class="dr-tip-title">${t.t}</div><div class="dr-tip-body">${t.b}</div></div>`).join('')}
+      </div>
+    </div>` : '';
+
+  document.getElementById('dr-panel').innerHTML = `
+    <div class="dr-health">
+      <span class="dr-pill ${saudeClass}">${saudeLabel}</span>
+      <span class="dr-scale ${scaleClass}">${scaleLabel}</span>
+    </div>
+    <div class="dr-hl">${headline}</div>
+    <div class="dr-body">${relacao}</div>
+    ${aprendWarn}
+    <div class="dr-section">
+      <div class="dr-sec-title">Otimizações recomendadas</div>
+      <div class="dr-actions">
+        ${acoes.map(a => `<div class="dr-action">${a}</div>`).join('')}
+      </div>
+    </div>
+    ${tipsHtml}
+  `;
+
+  const panel = document.getElementById('dr-panel');
+  panel.classList.add('vis');
+  setTimeout(() => panel.scrollIntoView({behavior:'smooth', block:'nearest'}), 80);
+}
+</script>
+</body>
+</html>

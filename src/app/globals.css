@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap');
+
+@layer base {
+  :root {
+    --color-surface: #0a0a0b;
+    --color-surface-card: rgba(255, 255, 255, 0.03);
+    --color-surface-hover: rgba(255, 255, 255, 0.06);
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-strong: rgba(255, 255, 255, 0.15);
+    --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  }
+
+  * {
+    @apply border-white/10;
+  }
+
+  body {
+    @apply bg-[#0a0a0b] text-white antialiased;
+    font-family: 'Satoshi', system-ui, sans-serif;
+  }
+
+  ::selection {
+    @apply bg-cyan-500/30 text-white;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full hover:bg-white/20;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-[24px] shadow-lg shadow-black/60 backdrop-blur-[24px];
+    background: var(--glass-bg);
+    position: relative;
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: 24px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+  }
+
+  .glass-card-sm {
+    @apply rounded-[16px] shadow-lg shadow-black/60 backdrop-blur-[24px];
+    background: var(--glass-bg);
+    position: relative;
+  }
+
+  .glass-card-sm::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: 16px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+  }
+
+  .solid-card {
+    @apply rounded-[24px] shadow-lg border border-white/15 p-5 sm:p-6;
+  }
+
+  .icon-box {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-[16px] border;
+  }
+
+  .pill-btn {
+    @apply inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[11px] font-medium transition border;
+  }
+
+  .nav-link {
+    @apply text-sm text-neutral-400 hover:text-white transition-colors duration-200;
+  }
+
+  .nav-link.active {
+    @apply text-white font-medium;
+  }
+
+  .section-label {
+    @apply text-xs font-medium uppercase tracking-[0.14em] text-neutral-400;
+  }
+
+  .fade-up {
+    animation: fadeUp 0.5s ease-out;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

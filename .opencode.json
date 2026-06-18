@@ -1,0 +1,4 @@
+{
+  "skills": ["analytics-map"],
+  "customInstructions": "Este projeto é uma plataforma de diagnóstico de mídia performance em Next.js. Sempre use Tailwind + Aurora design system (tema escuro, glassmorphism). Componentes em src/components/, engine em src/lib/engine/. Store Zustand em src/store/. Consulte a skill analytics-map para contexto completo."
+}

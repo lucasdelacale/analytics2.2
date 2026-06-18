@@ -1,0 +1,29 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Analysis {
+  id                  String     @id @default(uuid()) @db.Uuid
+  platform            String
+  campaignType        String     @map("campaign_type")
+  funnelStage         String     @map("funnel_stage")
+  auctionModel        String?    @map("auction_model")
+  conversionEvent     String?    @map("conversion_event")
+  metrics             Json
+  healthScore         Int?       @map("health_score")
+  scaleClassification String?    @map("scale_classification")
+  recommendations     Json?
+  aiInsight           String?    @map("ai_insight")
+  userFeedback        String?    @map("user_feedback")
+  createdAt           DateTime   @default(now()) @map("created_at")
+
+  @@map("analyses")
+}
