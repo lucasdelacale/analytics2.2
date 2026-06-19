@@ -15,6 +15,7 @@ export const metadata: Metadata = {
       "Plataforma inteligente de diagnóstico e otimização para campanhas de marketing digital, mídia performance e growth.",
     type: "website",
     siteName: "Analytics Map",
+    url: "https://lucasdelacale.github.io/analytics2.2",
     locale: "pt_BR",
   },
   twitter: {
