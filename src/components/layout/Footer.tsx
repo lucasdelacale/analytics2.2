@@ -1,4 +1,5 @@
 import { ChartLine } from "lucide-react";
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -36,13 +37,13 @@ export function Footer() {
                 { label: "Radar de Alertas", href: "/radar" },
                 { label: "Agente IA", href: "/agente-ia" },
               ].map((link) => (
-                <a
+                <Link
                   key={link.href}
                   href={link.href}
                   className="block text-xs text-neutral-500 hover:text-neutral-300 transition"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

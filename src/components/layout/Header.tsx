@@ -1,6 +1,7 @@
 "use client";
 
 import { ChartLine, Menu, X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const navItems = [
@@ -30,13 +31,13 @@ export function Header() {
 
           <nav className="hidden lg:flex items-center gap-6">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className="text-sm text-neutral-400 hover:text-white transition-colors duration-200"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -56,13 +57,13 @@ export function Header() {
       {mobileOpen && (
         <nav className="lg:hidden border-t border-white/10 px-4 py-3 space-y-2">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className="block text-sm text-neutral-400 hover:text-white transition-colors py-1.5"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
       )}

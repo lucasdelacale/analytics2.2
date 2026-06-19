@@ -11,7 +11,7 @@
 <p align="center">
   Plataforma inteligente de diagnóstico e otimização para campanhas de mídia performance.
   <br/>
-  <a href="https://lucasdelacale.github.io/analytics2.0/"><strong>Acessar o app →</strong></a>
+  <a href="https://lucasdelacale.github.io/analytics2.2/"><strong>Acessar o app →</strong></a>
 </p>
 
 ---
@@ -81,8 +81,8 @@ O design segue o sistema **Aurora** com tema escuro e glassmorphism:
 
 ```bash
 # Clone o repositório
-git clone https://github.com/lucasdelacale/analytics2.0.git
-cd analytics2.0
+git clone https://github.com/lucasdelacale/analytics2.2.git
+cd analytics2.2
 
 # Instale as dependências
 npm install

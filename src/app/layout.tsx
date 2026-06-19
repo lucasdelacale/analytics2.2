@@ -8,6 +8,21 @@ export const metadata: Metadata = {
   title: "Analytics Map — Diagnóstico de Mídia Performance",
   description:
     "Plataforma inteligente de diagnóstico e otimização para campanhas de marketing digital, mídia performance e growth.",
+  icons: { icon: "/favicon.svg" },
+  openGraph: {
+    title: "Analytics Map — Diagnóstico de Mídia Performance",
+    description:
+      "Plataforma inteligente de diagnóstico e otimização para campanhas de marketing digital, mídia performance e growth.",
+    type: "website",
+    siteName: "Analytics Map",
+    locale: "pt_BR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Analytics Map — Diagnóstico de Mídia Performance",
+    description:
+      "Plataforma inteligente de diagnóstico e otimização para campanhas de marketing digital, mídia performance e growth.",
+  },
 };
 
 export default function RootLayout({
